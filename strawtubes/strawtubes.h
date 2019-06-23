@@ -72,7 +72,10 @@ class strawtubes: public FairDetector
     void SetStrawResolution(Double_t a, Double_t b) {v_drift = a; sigma_spatial=b;}
     Double_t StrawVdrift() {return v_drift;}
     Double_t StrawSigmaSpatial() {return sigma_spatial;}
-
+    
+    // for sagging
+    void SetStrawSagging(Double_t sagging);
+    
     /**      Create the detector geometry        */
     void ConstructGeometry();
 
@@ -147,6 +150,9 @@ class strawtubes: public FairDetector
     Int_t        fStraws_per_layer_tr34;  //!  Number of straws in one tr34 layer
     Double_t     v_drift;                 //! drift velocity  
     Double_t     sigma_spatial;           //! spatial resolution 
+    // new paremter for sagging
+    Double_t	 fsagging;
+
     /** container for data points */
 
     TClonesArray*  fstrawtubesPointCollection;

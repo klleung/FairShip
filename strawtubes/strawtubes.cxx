@@ -315,6 +315,12 @@ void strawtubes::SetTr34YDim(Double_t tr34ydim)
      //std::cout<<"fStraws_per_layer_tr34 "<<fStraws_per_layer_tr34<<" ftr34ydim "<< ftr34ydim << std::endl;          
 }
 
+// for sagging
+void strawtubes::SetStrawSagging(Double_t sagging)
+{
+     fsagging = sagging;
+}
+
 
 void strawtubes::ConstructGeometry()
 {

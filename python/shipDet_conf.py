@@ -322,7 +322,11 @@ def configure(run,ship_geo):
   Strawtubes.SetVacBox_x(ship_geo.strawtubes.VacBox_x)
   Strawtubes.SetVacBox_y(ship_geo.strawtubes.VacBox_y)
   Strawtubes.SetStrawLength(ship_geo.strawtubes.StrawLength)
- 
+
+  # sagging
+  Strawtubes.SetStrawSagging(ship_geo.strawtubes.StarwSagging) 
+
+
   if hasattr(ship_geo.strawtubes,"StrawLengthVeto"):
    Strawtubes.SetStrawLengthVeto(ship_geo.strawtubes.StrawLengthVeto) 
    Strawtubes.SetStrawLength12(ship_geo.strawtubes.StrawLength12)
