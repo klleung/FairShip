@@ -152,6 +152,10 @@ class strawtubes: public FairDetector
     Double_t     sigma_spatial;           //! spatial resolution 
     // new paremter for sagging
     Double_t	 fsagging;
+    // given the top and bot, with the private member fsagging, the function of shift is determined
+    // Then for a given 4vector, transofrm and return a new 4vector
+    // actually only space part is change
+    TLorentzVector CoodTransform(TVector3 top, TVector3 bot, TLorentzVector pos);
 
     /** container for data points */
 

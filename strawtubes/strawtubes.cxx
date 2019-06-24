@@ -141,6 +141,29 @@ Bool_t  strawtubes::ProcessHits(FairVolume* vol)
     TVector3 uCrossv = u.Cross(v);
     Double_t dist2Wire  = fabs(pq.Dot(uCrossv))/(uCrossv.Mag()+1E-8);
     Double_t deltaTrackLength = gMC->TrackLength() - fLength; 
+    
+
+    // Assuming a sagging in a parabolic function, end point have no sagging
+    // the max. amount of sagging is determined by fsagging
+    //
+    // A simple version:
+    // only shift in coordinate, but using same method to calculate other values
+    // which means approximate the result by using a straight strawtube
+    // need further modification to calculate the dist2wire
+    /*
+    TVector3 bot,top;
+    StrawEndPoints(straw_uniqueId,bot,top);
+    TLorentzVector Pos;
+    gMC->TrackPosition(Pos);
+    
+    // Now coordinate shift, with shift = a(x-mid_x)^2+c
+    // and the middle of the straw will have maximum shift, i.e. x = 0.5(top.x + bot.x)
+    Double_t mid_x = (top.x()+bot.x())/2. ;
+    
+    TLorentzVector fPos_prime;			// the original fPos should be kept? may need further check
+    */
+
+
     AddHit(fTrackID, straw_uniqueId, TVector3(xmean, ymean,  zmean),
            TVector3(fMom.Px(), fMom.Py(), fMom.Pz()), fTime, deltaTrackLength,
            fELoss,pdgCode,dist2Wire);
@@ -164,11 +187,22 @@ Bool_t  strawtubes::ProcessHits(FairVolume* vol)
   return kTRUE;
 }
 
+// the new function that calculate the amount of sagging
+// the given top and bot determine the exact form of a(x-b)^2 + c
+TLorentzVector strawtubes::CoodTransform(TVector3 top, TVector3 bot, TLorentzVector pos)
+{
+  Double_t a = 4.*fsagging/TMath.sq(top.x()-bot.x());
+  Double_t b = (top.x()+bot.x())/2. ;
+  Double_t c = 0.-fsagging;
+  Double_t delta_y = a*TMath.sq(pos.X()-b)+c;
+  TLorentzVector temp = TLorentzVector(0.,delta_y,0.,0.);
+  return pos+temp;
+}
+
 void strawtubes::EndOfEvent()
 {
   fstrawtubesPointCollection->Clear();
 }
-
 
 
 void strawtubes::Register()
@@ -318,7 +352,7 @@ void strawtubes::SetTr34YDim(Double_t tr34ydim)
 // for sagging
 void strawtubes::SetStrawSagging(Double_t sagging)
 {
-     fsagging = sagging;
+     fsagging = sagging;				 //! the max. amount of sagging for parabolic shift 
 }
 
 
