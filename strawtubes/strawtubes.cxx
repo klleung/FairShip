@@ -128,6 +128,7 @@ Bool_t  strawtubes::ProcessHits(FairVolume* vol)
          return kTRUE; }
     fVolumeID = straw_uniqueId;
      // # d = |pq . u x v|/|u x v|
+    /* The original version
     TVector3 bot,top;
     StrawEndPoints(straw_uniqueId,bot,top);
     TLorentzVector Pos; 
@@ -141,7 +142,7 @@ Bool_t  strawtubes::ProcessHits(FairVolume* vol)
     TVector3 uCrossv = u.Cross(v);
     Double_t dist2Wire  = fabs(pq.Dot(uCrossv))/(uCrossv.Mag()+1E-8);
     Double_t deltaTrackLength = gMC->TrackLength() - fLength; 
-    
+    */
 
     // Assuming a sagging in a parabolic function, end point have no sagging
     // the max. amount of sagging is determined by fsagging
@@ -150,18 +151,26 @@ Bool_t  strawtubes::ProcessHits(FairVolume* vol)
     // only shift in coordinate, but using same method to calculate other values
     // which means approximate the result by using a straight strawtube
     // need further modification to calculate the dist2wire
-    /*
+    
     TVector3 bot,top;
     StrawEndPoints(straw_uniqueId,bot,top);
     TLorentzVector Pos;
     gMC->TrackPosition(Pos);
-    
-    // Now coordinate shift, with shift = a(x-mid_x)^2+c
-    // and the middle of the straw will have maximum shift, i.e. x = 0.5(top.x + bot.x)
-    Double_t mid_x = (top.x()+bot.x())/2. ;
-    
-    TLorentzVector fPos_prime;			// the original fPos should be kept? may need further check
-    */
+ 
+    // Now coordinate shift, with shift = a(x-b)^2+c
+    TLorentzVector fPos_prime = CoorTransform(top,bot,fPos);// the original fPos should be kept? may need further check
+    TLorentzVector Pos_prime = CoorTransform(top,bot,Pos);
+    Double_t xmean = (fPos_prime.X()+Pos_prime.X())/2. ;
+    Double_t ymean = (fPos_prime.Y()+Pos_prime.Y())/2. ;
+    Double_t zmean = (fPos_prime.Z()+Pos_prime.Z())/2. ;
+
+    // This part haven't change
+    TVector3 pq = TVector3(top.x()-xmean,top.y()-ymean,top.z()-zmean );
+    TVector3 u  = TVector3(bot.x()-top.x(),bot.y()-top.y(),bot.z()-top.z() ); 
+    TVector3 v  = TVector3(fPos.X()-Pos.X(),fPos.Y()-Pos.Y(),fPos.Z()-Pos.Z());
+    TVector3 uCrossv = u.Cross(v);
+    Double_t dist2Wire  = fabs(pq.Dot(uCrossv))/(uCrossv.Mag()+1E-8);
+    Double_t deltaTrackLength = gMC->TrackLength() - fLength; 
 
 
     AddHit(fTrackID, straw_uniqueId, TVector3(xmean, ymean,  zmean),
@@ -189,7 +198,7 @@ Bool_t  strawtubes::ProcessHits(FairVolume* vol)
 
 // the new function that calculate the amount of sagging
 // the given top and bot determine the exact form of a(x-b)^2 + c
-TLorentzVector strawtubes::CoodTransform(TVector3 top, TVector3 bot, TLorentzVector pos)
+TLorentzVector strawtubes::CoorTransform(TVector3 top, TVector3 bot, TLorentzVector pos)
 {
   Double_t a = 4.*fsagging/TMath.sq(top.x()-bot.x());
   Double_t b = (top.x()+bot.x())/2. ;
