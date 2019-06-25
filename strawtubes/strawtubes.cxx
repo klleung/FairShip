@@ -160,17 +160,31 @@ Bool_t  strawtubes::ProcessHits(FairVolume* vol)
     // Now coordinate shift, with shift = a(x-b)^2+c
     TLorentzVector fPos_prime = CoorTransform(top,bot,fPos);// the original fPos should be kept? may need further check
     TLorentzVector Pos_prime = CoorTransform(top,bot,Pos);
+    
+    // calculate the dist2wire by approximation, although it seems can be solved analytiaclly,
+    // with some messy steps, solution of cubic equation, etc.(doable later)
+    
+    // approximate the tube by ideal cylinder locally
+    // then apply the same method to calculate the dist2wire in ideal case
     Double_t xmean = (fPos_prime.X()+Pos_prime.X())/2. ;
     Double_t ymean = (fPos_prime.Y()+Pos_prime.Y())/2. ;
     Double_t zmean = (fPos_prime.Z()+Pos_prime.Z())/2. ;
 
-    // This part haven't change
-    TVector3 pq = TVector3(top.x()-xmean,top.y()-ymean,top.z()-zmean );
-    TVector3 u  = TVector3(bot.x()-top.x(),bot.y()-top.y(),bot.z()-top.z() ); 
-    TVector3 v  = TVector3(fPos.X()-Pos.X(),fPos.Y()-Pos.Y(),fPos.Z()-Pos.Z());
+    // consider the tube between enter and exit points
+    // approximate this part as a ideal cylinder
+    // so set the new top and bottom end points of this strawtube sagment
+    TVector3 top_prime, bot_prime;
+    top_prime = (TMath.abs(fPos_prime.X()-top.x())*bot + TMath.abs(fPos_prime.X()-bot.x())*top)/TMath.abs(top.x()-bot.x());	// find cutting place by considering the ratio
+    top_prime = CoorTransform(top,bot,top_prime);					 // transform it
+    bot_prime = (TMath.abs(Pos_prime.X()-top.x())*bot + TMath.abs(Pos_prime.X()-bot.x())*top)/TMath.abs(top.x()-bot.x();	// same as top_prime
+    bot_prime = CoorTransform(top,bot,bot_prime)
+
+    TVector3 pq = TVector3(top_prime.x()-xmean,top_prime.y()-ymean,top_prime.z()-zmean );
+    TVector3 u  = TVector3(bot_prime.x()-top_prime.x(),bot_prime.y()-top_prime.y(),bot_prime.z()-top_prime.z() ); 
+    TVector3 v  = TVector3(fPos_prime.X()-Pos_prime.X(),fPos_prime.Y()-Pos_prime.Y(),fPos_prime.Z()-Pos_prime.Z());
     TVector3 uCrossv = u.Cross(v);
     Double_t dist2Wire  = fabs(pq.Dot(uCrossv))/(uCrossv.Mag()+1E-8);
-    Double_t deltaTrackLength = gMC->TrackLength() - fLength; 
+    Double_t deltaTrackLength = gMC->TrackLength() - fLength;				 // no change, need change(?) 
 
 
     AddHit(fTrackID, straw_uniqueId, TVector3(xmean, ymean,  zmean),
@@ -212,6 +226,7 @@ void strawtubes::EndOfEvent()
 {
   fstrawtubesPointCollection->Clear();
 }
+
 
 
 void strawtubes::Register()
