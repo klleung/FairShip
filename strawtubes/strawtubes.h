@@ -155,7 +155,8 @@ class strawtubes: public FairDetector
     // given the top and bot, with the private member fsagging, the function of shift is determined
     // Then for a given 4vector, transofrm and return a new 4vector
     // actually only space part is change
-    TLorentzVector CoorTransform(TVector3 top, TVector3 bot, TLorentzVector pos);
+    TVector3 CoorTransform(TVector3 top, TVector3 bot, TLorentzVector pos);
+    TVector3 CoorTransform(TVector3 top, TVector3 bot, TVector3 pos);
 
     /** container for data points */
 

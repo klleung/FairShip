@@ -158,30 +158,30 @@ Bool_t  strawtubes::ProcessHits(FairVolume* vol)
     gMC->TrackPosition(Pos);
  
     // Now coordinate shift, with shift = a(x-b)^2+c
-    TLorentzVector fPos_prime = CoorTransform(top,bot,fPos);// the original fPos should be kept? may need further check
-    TLorentzVector Pos_prime = CoorTransform(top,bot,Pos);
+    TVector3 fPos_prime = CoorTransform(top,bot,fPos);// the original fPos should be kept? may need further check
+    TVector3 Pos_prime = CoorTransform(top,bot,Pos);
     
     // calculate the dist2wire by approximation, although it seems can be solved analytiaclly,
     // with some messy steps, solution of cubic equation, etc.(doable later)
     
     // approximate the tube by ideal cylinder locally
     // then apply the same method to calculate the dist2wire in ideal case
-    Double_t xmean = (fPos_prime.X()+Pos_prime.X())/2. ;
-    Double_t ymean = (fPos_prime.Y()+Pos_prime.Y())/2. ;
-    Double_t zmean = (fPos_prime.Z()+Pos_prime.Z())/2. ;
+    Double_t xmean = (fPos_prime.x()+Pos_prime.x())/2. ;
+    Double_t ymean = (fPos_prime.y()+Pos_prime.y())/2. ;
+    Double_t zmean = (fPos_prime.z()+Pos_prime.z())/2. ;
 
     // consider the tube between enter and exit points
     // approximate this part as a ideal cylinder
     // so set the new top and bottom end points of this strawtube sagment
     TVector3 top_prime, bot_prime;
-    top_prime = (TMath.abs(fPos_prime.X()-top.x())*bot + TMath.abs(fPos_prime.X()-bot.x())*top)/TMath.abs(top.x()-bot.x());	// find cutting place by considering the ratio
+    top_prime = (TMath::abs(fPos_prime.x()-top.x())*bot + TMath::abs(fPos_prime.x()-bot.x())*top)/TMath::abs(top.x()-bot.x());	// find cutting place by considering the ratio
     top_prime = CoorTransform(top,bot,top_prime);					 // transform it
-    bot_prime = (TMath.abs(Pos_prime.X()-top.x())*bot + TMath.abs(Pos_prime.X()-bot.x())*top)/TMath.abs(top.x()-bot.x();	// same as top_prime
+    bot_prime = (TMath::abs(Pos_prime.x()-top.x())*bot + TMath::abs(Pos_prime.x()-bot.x())*top)/TMath::abs(top.x()-bot.x();	// same as top_prime
     bot_prime = CoorTransform(top,bot,bot_prime)
 
-    TVector3 pq = TVector3(top_prime.x()-xmean,top_prime.y()-ymean,top_prime.z()-zmean );
+    TVector3 pq = TVector3(top_prime.x()-xmean,top_prime.y()-ymean,top_prime.z()-zmean);
     TVector3 u  = TVector3(bot_prime.x()-top_prime.x(),bot_prime.y()-top_prime.y(),bot_prime.z()-top_prime.z() ); 
-    TVector3 v  = TVector3(fPos_prime.X()-Pos_prime.X(),fPos_prime.Y()-Pos_prime.Y(),fPos_prime.Z()-Pos_prime.Z());
+    TVector3 v  = TVector3(fPos_prime.x()-Pos_prime.x(),fPos_prime.y()-Pos_prime.y(),fPos_prime.z()-Pos_prime.z());
     TVector3 uCrossv = u.Cross(v);
     Double_t dist2Wire  = fabs(pq.Dot(uCrossv))/(uCrossv.Mag()+1E-8);
     Double_t deltaTrackLength = gMC->TrackLength() - fLength;				 // no change, need change(?) 
@@ -212,13 +212,24 @@ Bool_t  strawtubes::ProcessHits(FairVolume* vol)
 
 // the new function that calculate the amount of sagging
 // the given top and bot determine the exact form of a(x-b)^2 + c
-TLorentzVector strawtubes::CoorTransform(TVector3 top, TVector3 bot, TLorentzVector pos)
+TVector3 strawtubes::CoorTransform(TVector3 top, TVector3 bot, TLorentzVector pos)
 {
-  Double_t a = 4.*fsagging/TMath.sq(top.x()-bot.x());
+  Double_t a = 4.*fsagging/TMath::sq(top.x()-bot.x());
   Double_t b = (top.x()+bot.x())/2. ;
   Double_t c = 0.-fsagging;
-  Double_t delta_y = a*TMath.sq(pos.X()-b)+c;
-  TLorentzVector temp = TLorentzVector(0.,delta_y,0.,0.);
+  Double_t delta_y = a*TMath::sq(pos.X()-b)+c;
+  TVector3 temp = TVector3(0.,delta_y,0.);
+  TVector3 pos3 = TVector3(pos.X(),pos.Y(),pos.Z());
+  return pos3+temp;
+}
+
+TVector3 strawtubes::CoorTransform(TVector3 top, TVector3 bot, TVector3 pos)
+{
+  Double_t a = 4.*fsagging/TMath::sq(top.x()-bot.x());
+  Double_t b = (top.x()+bot.x())/2. ;
+  Double_t c = 0.-fsagging;
+  Double_t delta_y = a*TMath::sq(pos.x()-b)+c;
+  TVector3 temp = TVector(0.,delta_y,0.);
   return pos+temp;
 }
 
