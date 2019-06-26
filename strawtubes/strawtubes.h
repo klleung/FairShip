@@ -72,7 +72,7 @@ class strawtubes: public FairDetector
     void SetStrawResolution(Double_t a, Double_t b) {v_drift = a; sigma_spatial=b;}
     Double_t StrawVdrift() {return v_drift;}
     Double_t StrawSigmaSpatial() {return sigma_spatial;}
- 
+
     // for sagging
     void SetStrawSagging(Double_t sagging);
     
