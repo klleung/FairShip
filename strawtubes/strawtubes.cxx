@@ -174,10 +174,10 @@ Bool_t  strawtubes::ProcessHits(FairVolume* vol)
     // approximate this part as a ideal cylinder
     // so set the new top and bottom end points of this strawtube sagment
     TVector3 top_prime, bot_prime;
-    top_prime = (TMath::abs(fPos_prime.x()-top.x())*bot + TMath::abs(fPos_prime.x()-bot.x())*top)/TMath::abs(top.x()-bot.x());	// find cutting place by considering the ratio
+    top_prime = (TMath::Abs(fPos_prime.x()-top.x())*bot + TMath::Abs(fPos_prime.x()-bot.x())*top)*(1./TMath::Abs(top.x()-bot.x()));	// find cutting place by considering the ratio
     top_prime = CoorTransform(top,bot,top_prime);					 // transform it
-    bot_prime = (TMath::abs(Pos_prime.x()-top.x())*bot + TMath::abs(Pos_prime.x()-bot.x())*top)/TMath::abs(top.x()-bot.x();	// same as top_prime
-    bot_prime = CoorTransform(top,bot,bot_prime)
+    bot_prime = (TMath::Abs(Pos_prime.x()-top.x())*bot + TMath::Abs(Pos_prime.x()-bot.x())*top)*(1./TMath::Abs(top.x()-bot.x()));	// same as top_prime
+    bot_prime = CoorTransform(top,bot,bot_prime);
 
     TVector3 pq = TVector3(top_prime.x()-xmean,top_prime.y()-ymean,top_prime.z()-zmean);
     TVector3 u  = TVector3(bot_prime.x()-top_prime.x(),bot_prime.y()-top_prime.y(),bot_prime.z()-top_prime.z() ); 
@@ -214,10 +214,10 @@ Bool_t  strawtubes::ProcessHits(FairVolume* vol)
 // the given top and bot determine the exact form of a(x-b)^2 + c
 TVector3 strawtubes::CoorTransform(TVector3 top, TVector3 bot, TLorentzVector pos)
 {
-  Double_t a = 4.*fsagging/TMath::sq(top.x()-bot.x());
+  Double_t a = 4.*fsagging/TMath::Sq(top.x()-bot.x());
   Double_t b = (top.x()+bot.x())/2. ;
   Double_t c = 0.-fsagging;
-  Double_t delta_y = a*TMath::sq(pos.X()-b)+c;
+  Double_t delta_y = a*TMath::Sq(pos.X()-b)+c;
   TVector3 temp = TVector3(0.,delta_y,0.);
   TVector3 pos3 = TVector3(pos.X(),pos.Y(),pos.Z());
   return pos3+temp;
@@ -225,11 +225,11 @@ TVector3 strawtubes::CoorTransform(TVector3 top, TVector3 bot, TLorentzVector po
 
 TVector3 strawtubes::CoorTransform(TVector3 top, TVector3 bot, TVector3 pos)
 {
-  Double_t a = 4.*fsagging/TMath::sq(top.x()-bot.x());
+  Double_t a = 4.*fsagging/TMath::Sq(top.x()-bot.x());
   Double_t b = (top.x()+bot.x())/2. ;
   Double_t c = 0.-fsagging;
-  Double_t delta_y = a*TMath::sq(pos.x()-b)+c;
-  TVector3 temp = TVector(0.,delta_y,0.);
+  Double_t delta_y = a*TMath::Sq(pos.x()-b)+c;
+  TVector3 temp = TVector3(0.,delta_y,0.);
   return pos+temp;
 }
 
