@@ -150,52 +150,89 @@ Bool_t  strawtubes::ProcessHits(FairVolume* vol)
     // A simple version:
     // only shift in coordinate, but using same method to calculate other values
     // which means approximate the result by using a straight strawtube
-    // need further modification to calculate the dist2wire
+    // wire and tube have different sagging
+    // only linearized locally but not assume the wire lies on center
     
     TVector3 bot,top;
     StrawEndPoints(straw_uniqueId,bot,top);
     TLorentzVector Pos;
     gMC->TrackPosition(Pos);
  
-    // Now coordinate shift, with shift = a(x-b)^2+c
-    TVector3 fPos_prime = CoorTransform(top,bot,fPos);// the original fPos should be kept? may need further check
-    TVector3 Pos_prime = CoorTransform(top,bot,Pos);
-    
-    // calculate the dist2wire by approximation, although it seems can be solved analytiaclly,
-    // with some messy steps, solution of cubic equation, etc.(doable later)
-    
-    // approximate the tube by ideal cylinder locally
-    // then apply the same method to calculate the dist2wire in ideal case
-    Double_t xmean = (fPos_prime.x()+Pos_prime.x())/2. ;
-    Double_t ymean = (fPos_prime.y()+Pos_prime.y())/2. ;
-    Double_t zmean = (fPos_prime.z()+Pos_prime.z())/2. ;
+    // calculate the dist2wire by approximation, although it seems like can be solved analytiaclly,
+    // with some messy steps, solution of cubic equation, etc.
+    // consider the tube inbetween enter and exit points
+    // this part will be approximaate as cylinder with linearized
 
-    // consider the tube between enter and exit points
-    // approximate this part as a ideal cylinder
-    // so set the new top and bottom end points of this strawtube sagment
+    // set the top and bottom end points of this wire(strawtube) sagment
+    // here, top_prime and bot_prime is just name, but may not be the "top" or "bottom", they may interchanged
     TVector3 top_prime, bot_prime;
-    top_prime = (TMath::Abs(fPos_prime.x()-top.x())*bot + TMath::Abs(fPos_prime.x()-bot.x())*top)*(1./TMath::Abs(top.x()-bot.x()));	// find cutting place by considering the ratio
-    top_prime = CoorTransform(top,bot,top_prime);					 // transform it
-    bot_prime = (TMath::Abs(Pos_prime.x()-top.x())*bot + TMath::Abs(Pos_prime.x()-bot.x())*top)*(1./TMath::Abs(top.x()-bot.x()));	// same as top_prime
-    bot_prime = CoorTransform(top,bot,bot_prime);
+    top_prime = ((top.x()-fPos.X())*bot + (fPos.X()-bot.x())*top)*(1./(top.x()-bot.x()));
+    bot_prime = ((top.x()-Pos.X())*bot + (Pos.X()-bot.x())*top)*(1./(top.x()-bot.x()));
+ 
+    // Coordinate shift
+    TVector3 fPos_prime = SaggingCoor(top,bot,fStrawSagging,fPos);
+    TVector3 Pos_prime = SaggingCoor(top,bot,fStrawSagging,Pos);
+    top_prime = SaggingCoor(top,bot,fWireSagging,top_prime);
+    bot_prime = SaggingCoor(top,bot,fWireSagging,bot_prime);
 
-    TVector3 pq = TVector3(top_prime.x()-xmean,top_prime.y()-ymean,top_prime.z()-zmean);
-    TVector3 u  = TVector3(bot_prime.x()-top_prime.x(),bot_prime.y()-top_prime.y(),bot_prime.z()-top_prime.z() ); 
-    TVector3 v  = TVector3(fPos_prime.x()-Pos_prime.x(),fPos_prime.y()-Pos_prime.y(),fPos_prime.z()-Pos_prime.z());
-    TVector3 uCrossv = u.Cross(v);
-    Double_t dist2Wire  = fabs(pq.Dot(uCrossv))/(uCrossv.Mag()+1E-8);
-    Double_t deltaTrackLength = gMC->TrackLength() - fLength;				 // no change, need change(?) 
+    // to find the dist2wire, it is a problem about distance between two straight line in 3D
+    // from result of calculus and linear algebra
+    // Vectors to simplify calculation
+    TVector3 u = Pos_prime - fPos_prime;
+    TVector3 v = top_prime - bot_prime;
+    TVector3 w = fPos_prime - bot_prime;
 
+    // matrix elements for solving system of equation
+    Double_t a = u.Dot(u);
+    Double_t b = 0.-u.Dot(v);
+    Double_t c = 0.-v.Dot(u);
+    Double_t d = v.Dot(v);
+    Double_t e = 0.-u.Dot(w);
+    Double_t f = v.Dot(w);
 
-    AddHit(fTrackID, straw_uniqueId, TVector3(xmean, ymean,  zmean),
+    Double_t determinant = a*d-b*c;	//determinant=0 means u parallel to v, which shell not happen in this case
+    if (determinant == 0.){ std::cout<<"determinant=0"<<std::endl; return kTRUE; }
+    Double_t k = (d*e-b*f)/determinant;
+    Double_t h = (-c*e+a*f)/determinant;
+
+    TVector3 HitPos = fPos_prime + k*u;
+    TVector3 r = k*u-h*v+w;
+    Double_t dist2Wire = r.Mag();
+
+    Double_t deltaTrackLength = gMC->TrackLength() - fLength;
+    AddHit(fTrackID, straw_uniqueId, HitPos,
            TVector3(fMom.Px(), fMom.Py(), fMom.Pz()), fTime, deltaTrackLength,
            fELoss,pdgCode,dist2Wire);
+
+    // print out the values, for debug, for comparsion
+    TLorentzVector mean = 0.5*(fPos + Pos);
+    TVector3 pq = TVector3(top.x()-mean.X(), top.y()-mean.Y(), top.z()-mean.Z());
+    u = bot - top;
+    v = TVector3(fPos.X()-Pos.X(), fPos.Y()-Pos.Y(), fPos.Z()-Pos.Z());
+    TVector3 uCrossv = u.Cross(v);
+    Double_t dist2Wire_origin = fabs(pq.Dot(uCrossv))/(uCrossv.Mag()+1E-8);
+    Double_t delta = dist2Wire-dist2Wire_origin;
+
+    std::cout << "==========================================================" <<std::endl;
+    std::cout.precision(7);
+    std::cout << "new       : " << dist2Wire << std::endl;
+    std::cout << "old       : " << dist2Wire_origin << std::endl;
+    std::cout << "delta     : " << delta << std::endl;
+    std::cout << "percentage: " << delta/dist2Wire << std::endl;
+    std::cout << "fPos      : " << fPos.X() << "," << fPos.Y() << "," << fPos.Z() << std::endl;
+    std::cout << "fPos_prime: " << fPos_prime.x() << "," << fPos_prime.y() << "," << fPos_prime.z() << std::endl;
+    std::cout << "Pos       : " << Pos.X() << "," << Pos.Y() << "," << Pos.Z() << std::endl;
+    std::cout << "Pos_prime : " << Pos_prime.x() << "," << Pos_prime.y() << "," << Pos_prime.z() << std::endl;
+    std::cout << "dx        : " << fPos.X()-Pos.X() << std::endl;
+    std::cout << "New hit   : " << HitPos.x() << "," << HitPos.y() << "," << HitPos.z() << std::endl;
+    std::cout << "Old hit   : " << mean.X() << "," << mean.Y() << "," << mean.Z() << std::endl;
+
     if (dist2Wire>fInner_Straw_diameter/2){  
      std::cout << "addhit " << dist2Wire<< " straw id " << straw_uniqueId << " pdgcode " << pdgCode<< " dot prod " << pq.Dot(uCrossv)<< std::endl;
      std::cout << " exit:" << gMC->IsTrackExiting() << " stop:" << gMC->IsTrackStop() << " disappeared:" << gMC->IsTrackDisappeared()<< std::endl;
      std::cout << " entry:" << fPos.X()<< " " << fPos.Y()<< " " << fPos.Z() << std::endl;
      std::cout << " exit:" << Pos.X()<< " " << Pos.Y()<< " " << Pos.Z() << std::endl;
-     std::cout << " mean:" << xmean<< " " << ymean << " " << zmean << std::endl;
+     std::cout << " mean:" << HitPos.x()<< " " << HitPos.y() << " " << HitPos.z() << std::endl;
      std::cout << " bot:" << bot.x()<< " " << bot.y() << " " << bot.z() << std::endl;
      std::cout << " top:" << top.x()<< " " << top.y() << " " << top.z() << std::endl;
      pq.Print();
@@ -212,22 +249,22 @@ Bool_t  strawtubes::ProcessHits(FairVolume* vol)
 
 // the new function that calculate the amount of sagging
 // the given top and bot determine the exact form of a(x-b)^2 + c
-TVector3 strawtubes::CoorTransform(TVector3 top, TVector3 bot, TLorentzVector pos)
+TVector3 strawtubes::SaggingCoor(TVector3 top, TVector3 bot, Double_t sagging, TLorentzVector pos)
 {
-  Double_t a = 4.*fsagging/TMath::Sq(top.x()-bot.x());
+  Double_t a = 4.*sagging/TMath::Sq(top.x()-bot.x());
   Double_t b = (top.x()+bot.x())/2. ;
-  Double_t c = 0.-fsagging;
+  Double_t c = 0.-sagging;
   Double_t delta_y = a*TMath::Sq(pos.X()-b)+c;
   TVector3 temp = TVector3(0.,delta_y,0.);
   TVector3 pos3 = TVector3(pos.X(),pos.Y(),pos.Z());
   return pos3+temp;
 }
 
-TVector3 strawtubes::CoorTransform(TVector3 top, TVector3 bot, TVector3 pos)
+TVector3 strawtubes::SaggingCoor(TVector3 top, TVector3 bot, Double_t sagging, TVector3 pos)
 {
-  Double_t a = 4.*fsagging/TMath::Sq(top.x()-bot.x());
+  Double_t a = 4.*sagging/TMath::Sq(top.x()-bot.x());
   Double_t b = (top.x()+bot.x())/2. ;
-  Double_t c = 0.-fsagging;
+  Double_t c = 0.-sagging;
   Double_t delta_y = a*TMath::Sq(pos.x()-b)+c;
   TVector3 temp = TVector3(0.,delta_y,0.);
   return pos+temp;
@@ -387,9 +424,13 @@ void strawtubes::SetTr34YDim(Double_t tr34ydim)
 // for sagging
 void strawtubes::SetStrawSagging(Double_t sagging)
 {
-     fsagging = sagging;				 //! the max. amount of sagging for parabolic shift 
+     fStrawSagging = sagging;				 //! the max. amount of sagging for parabolic shift 
 }
 
+void strawtubes::SetWireSagging(Double_t sagging)
+{
+     fWireSagging = sagging;
+}
 
 void strawtubes::ConstructGeometry()
 {

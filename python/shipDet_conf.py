@@ -325,7 +325,7 @@ def configure(run,ship_geo):
  
   # sagging
   Strawtubes.SetStrawSagging(ship_geo.strawtubes.StrawSagging) 
-
+  Strawtubes.SetWireSagging(ship_geo.strawtubes.WireSagging)
 
   if hasattr(ship_geo.strawtubes,"StrawLengthVeto"):
    Strawtubes.SetStrawLengthVeto(ship_geo.strawtubes.StrawLengthVeto) 

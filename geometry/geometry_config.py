@@ -161,6 +161,7 @@ with ConfigRegistry.register_config("basic") as c:
 
     # new added parameter, for sagging
     c.strawtubes.StrawSagging = 0.7*u.cm
+    c.strawtubes.WireSagging = 0.3*u.cm
 
     c.strawtubes.WallThickness      = 0.0039*u.cm
     c.strawtubes.OuterStrawDiameter = (c.strawtubes.InnerStrawDiameter + 2*c.strawtubes.WallThickness)

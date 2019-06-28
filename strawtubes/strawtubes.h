@@ -75,6 +75,7 @@ class strawtubes: public FairDetector
 
     // for sagging
     void SetStrawSagging(Double_t sagging);
+    void SetWireSagging(Double_t sagging);
     
     /**      Create the detector geometry        */
     void ConstructGeometry();
@@ -151,12 +152,14 @@ class strawtubes: public FairDetector
     Double_t     v_drift;                 //! drift velocity  
     Double_t     sigma_spatial;           //! spatial resolution 
     // new paremter for sagging
-    Double_t	 fsagging;
+    Double_t	 fStrawSagging;
+    Double_t     fWireSagging;
+
     // given the top and bot, with the private member fsagging, the function of shift is determined
     // Then for a given 4vector, transofrm and return a new 4vector
     // actually only space part is change
-    TVector3 CoorTransform(TVector3 top, TVector3 bot, TLorentzVector pos);
-    TVector3 CoorTransform(TVector3 top, TVector3 bot, TVector3 pos);
+    TVector3 SaggingCoor(TVector3 top, TVector3 bot, Double_t sagging, TLorentzVector pos);
+    TVector3 SaggingCoor(TVector3 top, TVector3 bot, Double_t sagging, TVector3 pos);
 
     /** container for data points */
 
