@@ -142,16 +142,17 @@ Bool_t  strawtubes::ProcessHits(FairVolume* vol)
     TVector3 uCrossv = u.Cross(v);
     Double_t dist2Wire  = fabs(pq.Dot(uCrossv))/(uCrossv.Mag()+1E-8);
     Double_t deltaTrackLength = gMC->TrackLength() - fLength; 
+    AddHit(fTrackID, straw_uniqueId, TVector3(xmean, ymean,  zmean),
+           TVector3(fMom.Px(), fMom.Py(), fMom.Pz()), fTime, deltaTrackLength,
+           fELoss,pdgCode,dist2Wire);
     */
 
     // Assuming a sagging in a parabolic function, end point have no sagging
     // the max. amount of sagging is determined by fsagging
     //
-    // A simple version:
-    // only shift in coordinate, but using same method to calculate other values
-    // which means approximate the result by using a straight strawtube
+    // shift in coordinate, approximate by a straight strawtube locally
     // wire and tube have different sagging
-    // only linearized locally but not assume the wire lies on center
+    // not assume the wire lies on center
     
     TVector3 bot,top;
     StrawEndPoints(straw_uniqueId,bot,top);
@@ -190,10 +191,29 @@ Bool_t  strawtubes::ProcessHits(FairVolume* vol)
     Double_t e = 0.-u.Dot(w);
     Double_t f = v.Dot(w);
 
-    Double_t determinant = a*d-b*c;	//determinant=0 means u parallel to v, which shell not happen in this case
+    Double_t determinant = a*d-b*c;
+    //determinant=0 means u parallel to v, which shell not(?) happen in this case
     if (determinant == 0.){ std::cout<<"determinant=0"<<std::endl; return kTRUE; }
     Double_t k = (d*e-b*f)/determinant;
     Double_t h = (-c*e+a*f)/determinant;
+
+    // need to handle if k not lie in [0,1], (?) will it really happen (?)
+    // if out of range, consider the nearest end point
+    if ((k < 0) or (k > 1))
+    {
+      std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+      std::cout << "k = " << k << std::endl;
+      std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+      k = (k<0) ? 0 : k;
+      k = (k>1) ? 1 : k;
+    } 
+    // h can be out of the [0,1] (?)
+    if ((h < 0) or (h > 1))
+    {
+      std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+      std::cout << "h = " << h << std::endl;
+      std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+    }
 
     TVector3 HitPos = fPos_prime + k*u;
     TVector3 r = k*u-h*v+w;
@@ -227,6 +247,9 @@ Bool_t  strawtubes::ProcessHits(FairVolume* vol)
     std::cout << "New hit   : " << HitPos.x() << "," << HitPos.y() << "," << HitPos.z() << std::endl;
     std::cout << "Old hit   : " << mean.X() << "," << mean.Y() << "," << mean.Z() << std::endl;
 
+    // if the tube and the wire has different sagging, i.e. strawsagging != wiresagging
+    // then the wire is not in the center, dist2Wire can be larger then the radius.
+    /*
     if (dist2Wire>fInner_Straw_diameter/2){  
      std::cout << "addhit " << dist2Wire<< " straw id " << straw_uniqueId << " pdgcode " << pdgCode<< " dot prod " << pq.Dot(uCrossv)<< std::endl;
      std::cout << " exit:" << gMC->IsTrackExiting() << " stop:" << gMC->IsTrackStop() << " disappeared:" << gMC->IsTrackDisappeared()<< std::endl;
@@ -240,6 +263,7 @@ Bool_t  strawtubes::ProcessHits(FairVolume* vol)
      v.Print();
      uCrossv.Print();
     }
+    */
     // Increment number of strawtubes det points in TParticle
     ShipStack* stack = (ShipStack*) gMC->GetStack();
     stack->AddPoint(kStraw);
