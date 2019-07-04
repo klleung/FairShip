@@ -35,6 +35,7 @@ class strawtubesHit : public ShipHit
     /** Copy constructor **/
     strawtubesHit(const strawtubesHit& point);
     strawtubesHit operator=(const strawtubesHit& point);
+    TRandom3 *rand = new TRandom3();
 
     Float_t flag;   ///< flag
 

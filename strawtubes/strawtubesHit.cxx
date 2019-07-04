@@ -45,10 +45,8 @@ strawtubesHit::strawtubesHit(strawtubesPoint* p, Double_t t0)
      Double_t mpvTime = 622.8 * dist * dist + 5.285;
      Double_t probability = 8.52 * exp(-4.66 * dist) + 31.81 * exp(-23.92 * dist) + 0.419;
      Double_t sigmaParam = mpvTime * probability / 100;
-     TRandom3 *rand = new TRandom3(); //should be Global for the class
      Double_t t_drift = rand->Landau(mpvTime, sigmaParam);
-
-     fdigi = t0 + p->GetTime() + t_drift + ( stop[0]-p->GetX() )/ speedOfLight;
+     fdigi = t0 + p->GetTime() + t_drift + ( stop[0]-p->GetX() ) / speedOfLight;
      flag = true;
 }
 void strawtubesHit::StrawEndPoints(TVector3 &vbot, TVector3 &vtop)
