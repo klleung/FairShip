@@ -199,6 +199,7 @@ Bool_t  strawtubes::ProcessHits(FairVolume* vol)
 
     // need to handle if k not lie in [0,1], (?) will it really happen (?)
     // if out of range, consider the nearest end point
+    std::cout << "==========================================================" <<std::endl;
     if ((k < 0) or (k > 1))
     {
       std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
@@ -213,6 +214,7 @@ Bool_t  strawtubes::ProcessHits(FairVolume* vol)
       std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
       std::cout << "h = " << h << std::endl;
       std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+      std::cout << h * (fPos_prime.x() - Pos_prime.x()) << std::endl;
     }
 
     TVector3 HitPos = fPos_prime + k*u;
@@ -233,7 +235,6 @@ Bool_t  strawtubes::ProcessHits(FairVolume* vol)
     Double_t dist2Wire_origin = fabs(pq.Dot(uCrossv))/(uCrossv.Mag()+1E-8);
     Double_t delta = dist2Wire-dist2Wire_origin;
 
-    std::cout << "==========================================================" <<std::endl;
     std::cout.precision(7);
     std::cout << "new       : " << dist2Wire << std::endl;
     std::cout << "old       : " << dist2Wire_origin << std::endl;
