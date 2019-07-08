@@ -1,5 +1,6 @@
 #include "strawtubesHit.h"
 #include "strawtubes.h"
+#include "strawtubesDigi.h"
 #include "TVector3.h"
 #include "FairRun.h"
 #include "FairRunSim.h"
@@ -39,14 +40,10 @@ strawtubesHit::strawtubesHit(strawtubesPoint* p, Double_t t0)
      Double_t v_drift       = module->StrawVdrift();
      Double_t sigma_spatial = module->StrawSigmaSpatial();
      module->StrawEndPoints(fDetectorID,start,stop);
-     // Double_t t_drift = fabs( gRandom->Gaus( p->dist2Wire(), sigma_spatial ) )/v_drift;
 
-     Double_t dist = p->dist2Wire();
-     Double_t mpvTime = 622.8 * dist * dist + 5.285;
-     Double_t probability = 8.52 * exp(-4.66 * dist) + 31.81 * exp(-23.92 * dist) + 0.419;
-     Double_t sigmaParam = mpvTime * probability / 100;
-     Double_t t_drift = rand->Landau(mpvTime, sigmaParam);
-     fdigi = t0 + p->GetTime() + t_drift + ( stop[0]-p->GetX() ) / speedOfLight;
+     strawtubesDigi *signal = new strawtubesDigi();
+     signal->setDist2Wire(p->dist2Wire());
+     fdigi = t0 + p->GetTime() + signal->getDriftTime() + (stop[0] - p->GetX()) / speedOfLight;
      flag = true;
 }
 void strawtubesHit::StrawEndPoints(TVector3 &vbot, TVector3 &vtop)

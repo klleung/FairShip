@@ -769,18 +769,19 @@ class ShipDigiReco:
    #distance to wire
      delt1 = (start[2]-z1)/u.speedOfLight
      p=self.sTree.strawtubesPoint[key]
+
      # use true t0  construction: 
      #     fdigi = t0 + p->GetTime() + t_drift + ( stop[0]-p->GetX() )/ speedOfLight;
 
-     driftTime = (aDigi.GetDigi() - self.sTree.t0 - p.GetTime() - (stop[0]-p.GetX()) / u.speedOfLight)
-     smear = ROOT.TMath.Sqrt(ROOT.TMath.Abs(driftTime - 5.285)/622.8)
+     driftTime = ROOT.strawtubesDigi.getDriftTime()
+     smear = ROOT.strawtubesDigi.getRecoDist()
 
-     if no_amb: smear = p.dist2Wire()
+     if no_amb: smear = ROOT.strawtubesDigi.getDist2Wire
 
      SmearedHits.append( {'digiHit':key,'xtop':stop.x(),'ytop':stop.y(),'z':stop.z(),'xbot':start.x(),'ybot':start.y(),'dist':smear, 'detID':detID} )
      # Note: top.z()==bot.z() unless misaligned, so only add key 'z' to smearedHit
 
-     h['DriftTime_dist'].Fill(p.dist2Wire(), driftTime)
+     h['vshape'].Fill(modules["ModuleName"].getDist2Wire, driftTime)
 
 
      if abs(stop.y())==abs(start.y()): h['disty'].Fill(smear)

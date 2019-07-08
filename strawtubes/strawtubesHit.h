@@ -6,6 +6,7 @@
 #include "strawtubesPoint.h"
 #include "TObject.h"
 #include "TVector3.h"
+#include "TRandom.h"
 
 class strawtubesHit : public ShipHit
 {
@@ -35,7 +36,7 @@ class strawtubesHit : public ShipHit
     /** Copy constructor **/
     strawtubesHit(const strawtubesHit& point);
     strawtubesHit operator=(const strawtubesHit& point);
-    TRandom3 *rand = new TRandom3();
+    TRandom *rand = new TRandom();
 
     Float_t flag;   ///< flag
 

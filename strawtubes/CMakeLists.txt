@@ -21,6 +21,7 @@ set(SRCS
 #Put here your sourcefiles
 strawtubes.cxx
 strawtubesContFact.cxx
+strawtubesDigi.cxx
 strawtubesPoint.cxx
 strawtubesHit.cxx
 Tracklet.cxx
