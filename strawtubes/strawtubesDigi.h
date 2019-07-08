@@ -19,17 +19,11 @@ class strawtubesDigi {
  * LandauSigma = mpvTime * f2 / 100;
  */
 
-    void setLandauParams(Double_t p1, Double_t p2, Double_t p3, Double_t p4, Double_t p5) {
-      this->p1 = p1;
-      this->p2 = p2;
-      this->p3 = p3;
-      this->p4 = p4;
-      this->p5 = p5;
-    };
+    void setLandauParams(Double_t p1, Double_t p2, Double_t p3, Double_t p4, Double_t p5);
 
     Double_t getDriftTime() { return driftTime; };
     Double_t getRecoDist() { return recoDist; };
-    Double_t getDist2Wire { return dist2Wire; };
+    Double_t getDist2Wire() { return dist2Wire; };
 
     Double_t setDist2Wire(Double_t dist2Wire) { this->dist2Wire = dist2Wire};
 

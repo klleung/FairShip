@@ -30,3 +30,11 @@ void strawtubesDigi::driftTimeCalculation() {
 void strawtubesDigi::recoDistCalculation() {
    recoDist = timeDependence->GetX(driftTime, 0., 1.);
 }
+
+void strawtubesDigi::setLandauParams(Double_t p1, Double_t p2, Double_t p3, Double_t p4, Double_t p5) {
+   this->p1 = p1;
+   this->p2 = p2;
+   this->p3 = p3;
+   this->p4 = p4;
+   this->p5 = p5;
+}
