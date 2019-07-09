@@ -2,7 +2,7 @@
 #define STRAWTUBESDIGI_H
 
 #include "strawtubesPoint.h"
-#include "TRandom2.h"
+#include "TRandom.h"
 #include "TF1.h"
 #include "TMath.h"
 
@@ -28,7 +28,7 @@ class strawtubesDigi {
     void setDist2Wire(Double_t dist2Wire) { this->dist2Wire = dist2Wire; };
 
   private:
-    TRandom2 *rand = new TRandom2();
+    TRandom *rand = new TRandom();
     Double_t dist2Wire;
     Double_t mpvTime;               //! MPV for the Landau distribution
     Double_t LandauSigma;           //! sigma for the Landau distribution
