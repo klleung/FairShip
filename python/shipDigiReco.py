@@ -773,15 +773,16 @@ class ShipDigiReco:
      # use true t0  construction: 
      #     fdigi = t0 + p->GetTime() + t_drift + ( stop[0]-p->GetX() )/ speedOfLight;
 
-     driftTime = ROOT.strawtubesDigi.getDriftTime()
-     smear = ROOT.strawtubesDigi.getRecoDist()
+     strawtubesDigi = ROOT.strawtubesDigi()
+     driftTime = strawtubesDigi.getDriftTime()
+     smear = strawtubesDigi.getRecoDist()
 
-     if no_amb: smear = ROOT.strawtubesDigi.getDist2Wire
+     if no_amb: smear = strawtubesDigi.getDist2Wire()
 
      SmearedHits.append( {'digiHit':key,'xtop':stop.x(),'ytop':stop.y(),'z':stop.z(),'xbot':start.x(),'ybot':start.y(),'dist':smear, 'detID':detID} )
      # Note: top.z()==bot.z() unless misaligned, so only add key 'z' to smearedHit
 
-     h['vshape'].Fill(modules["ModuleName"].getDist2Wire, driftTime)
+     h['vshape'].Fill(strawtubesDigi.getDist2Wire, driftTime)
 
 
      if abs(stop.y())==abs(start.y()): h['disty'].Fill(smear)
