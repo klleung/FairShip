@@ -773,10 +773,10 @@ class ShipDigiReco:
      # use true t0  construction: 
      #     fdigi = t0 + p->GetTime() + t_drift + ( stop[0]-p->GetX() )/ speedOfLight;
 
-     strawtubesDigi = ROOT.strawtubesDigi()
+     # strawtubesDigi = ROOT.strawtubesDigi()
      driftTime = aDigi.GetDigi() - self.sTree.t0  - p.GetTime() - ( stop[0]-p.GetX() )/ u.speedOfLight
-     smear = strawtubesDigi.getRecoDist(driftTime)
-
+     # smear = strawtubesDigi.getRecoDist(driftTime)
+     smear = p.dist2Wire()
      if no_amb: smear = p.dist2Wire()
 
      SmearedHits.append( {'digiHit':key,'xtop':stop.x(),'ytop':stop.y(),'z':stop.z(),'xbot':start.x(),'ybot':start.y(),'dist':smear, 'detID':detID} )
