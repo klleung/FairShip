@@ -23,7 +23,7 @@ class strawtubesDigi {
 
     Double_t getDriftTime() { return driftTime; };
     Double_t DriftTime();
-    Double_t getRecoDist();
+    Double_t getRecoDist(Double_t time);
     Double_t getDist2Wire() { return dist2Wire; };
 
     void setDist2Wire(Double_t dist2Wire) { this->dist2Wire = dist2Wire; };
@@ -44,7 +44,7 @@ class strawtubesDigi {
 
     void driftTimeCalculation();
     Double_t f2calculation();       //! will return the f2 value for estimating the sigma parameter
-    void recoDistCalculation();
+    void recoDistCalculation(Double_t time);
 };
 
 
