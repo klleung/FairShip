@@ -774,6 +774,7 @@ class ShipDigiReco:
      #     fdigi = t0 + p->GetTime() + t_drift + ( stop[0]-p->GetX() )/ speedOfLight;
 
      strawtubesDigi = ROOT.strawtubesDigi()
+     strawtubesDigi.setDist2Wire(p.dist2Wire())
      driftTime = strawtubesDigi.getDriftTime()
      smear = strawtubesDigi.getRecoDist()
 
