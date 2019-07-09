@@ -39,7 +39,7 @@ void strawtubesDigi::setLandauParams(Double_t p1, Double_t p2, Double_t p3, Doub
    this->p5 = p5;
 }
 
-Double_t strawtubesDigi::getDriftTime() {
+Double_t strawtubesDigi::DriftTime() {
    driftTimeCalculation();
    return driftTime;
 }

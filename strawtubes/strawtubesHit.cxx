@@ -43,7 +43,7 @@ strawtubesHit::strawtubesHit(strawtubesPoint* p, Double_t t0)
 
      strawtubesDigi *signal = new strawtubesDigi();
      signal->setDist2Wire(p->dist2Wire());
-     fdigi = t0 + p->GetTime() + signal->getDriftTime() + (stop[0] - p->GetX()) / speedOfLight;
+     fdigi = t0 + p->GetTime() + signal->DriftTime() + (stop[0] - p->GetX()) / speedOfLight;
      flag = true;
 }
 void strawtubesHit::StrawEndPoints(TVector3 &vbot, TVector3 &vtop)
