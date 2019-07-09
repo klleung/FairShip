@@ -339,6 +339,7 @@ def configure(run,ship_geo):
   Strawtubes.SetStrawResolution(getParameter("strawtubes.v_drift",ship_geo,latestShipGeo),getParameter("strawtubes.sigma_spatial",ship_geo,latestShipGeo) )
   detectorList.append(Strawtubes)
 
+
  if ship_geo.EcalOption == 1:  # shashlik design TP 
   if ship_geo.preshowerOption > 0 :
    Preshower = ROOT.preshower("Preshower", ROOT.kTRUE)
