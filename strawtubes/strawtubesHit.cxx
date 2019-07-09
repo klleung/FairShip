@@ -29,9 +29,10 @@ strawtubesHit::strawtubesHit(Int_t detID, Float_t tdc)
  flag = true;
 }
 // -----   constructor from strawtubesPoint   ------------------------------------------
-strawtubesHit::strawtubesHit(strawtubesPoint* p, Double_t t0)
+strawtubesHit::strawtubesHit(strawtubesPoint* p, Double_t t0, bool misalign)
   : ShipHit()
 {
+     /*
      TVector3 start = TVector3();
      TVector3 stop  = TVector3();
      fDetectorID = p->GetDetectorID();
@@ -42,7 +43,115 @@ strawtubesHit::strawtubesHit(strawtubesPoint* p, Double_t t0)
      Double_t t_drift = fabs( gRandom->Gaus( p->dist2Wire(), sigma_spatial ) )/v_drift;
      fdigi = t0 + p->GetTime() + t_drift + ( stop[0]-p->GetX() )/ speedOfLight;
      flag = true;
+     */
+
+     TVector3 start = TVector3();
+     TVector3 stop  = TVector3();
+     fDetectorID = p->GetDetectorID();
+     strawtubes* module = dynamic_cast<strawtubes*> (FairRunSim::Instance()->GetListOfModules()->FindObject("Strawtubes") );
+     Double_t v_drift       = module->StrawVdrift();
+     Double_t sigma_spatial = module->StrawSigmaSpatial();
+     module->StrawEndPoints(fDetectorID,start,stop);
+
+     if (misalign)
+     {
+        // to calculate the dist2Wire under sagging, negative return means outside the tube
+        TVector3 pPos = TVector3(p->GetX(), p->GetY(), p->GetZ());
+        TVector3 wPos = ((start.x() - pPos.x()) * stop + (pPos.x() - stop.x()) * start) * (1./(start.x() - stop.x()));
+        Double_t r = 1.975/2.; // hard code, 
+        // need futher change, need somehow find a way to get the strawtube.InnerDiameter without changing the strawtube. part, 
+        // probably will be a pass as a parameter
+        // and in the pyhton part, get from some conf.py file(?)
+        Double_t tubeShift = FindTubeShift(pPos.x(), start.x(), stop.x(), fDetectorID);	// defined as +ve, the magnitude
+        Double_t wireShift = FindWireShift(pPos.x(), start.x(), stop.x(), fDetectorID);
+
+        // check if the hit point is outside the tube after tube has shift
+        Double_t y_prime = TMath::Sqrt(r*r - TMath::Sq(pPos.z() - wPos.z()));
+        if (wPos.y() + y_prime - pPos.y() < tubeShift)
+        {
+           // outside the tube
+           fdigi = -1;
+           flag = false;
+        }
+        else
+        {
+           TVector3 delta = pPos - (wPos - TVector3(0,wireShift,0));
+           Double_t dist = delta.Mag();
+           Double_t t_drift = fabs( gRandom->Gaus( dist, sigma_spatial ) )/v_drift;
+           fdigi = t0 + p->GetTime() + t_drift + ( stop[0]-p->GetX() )/ speedOfLight;
+           flag = true;
+        }
+     }
+     else
+     {
+        Double_t t_drift = fabs( gRandom->Gaus( p->dist2Wire(), sigma_spatial ) )/v_drift;
+        fdigi = t0 + p->GetTime() + t_drift + ( stop[0]-p->GetX() )/ speedOfLight;
+        flag = true;
+     }
 }
+
+void strawtubesHit::InitializeMisalign()
+{
+     // simple version first
+     // somehow hard code, may better seperated in a file? Or in some conf.py? Or by passing parameter
+     maxTubeSagging = 0.7;	// the code is using 1 cm as 1 code unit
+     maxWireSagging = 0.3;
+     sameSagging = true;
+
+     // not implemented for different sagging for different tube
+     // probably by the following pseudocode:
+     // 
+     // read a external file(may be .dat or .root or .py, anyway is possible)
+     // if the first line tells it is all same sagging
+     //     read the maxTube and maxWire
+     //     set sameSagging = true and return
+     // else
+     //     read the data pair for the maps, with the (key, value) = (ID, maxSagging)
+     //     set sameSagging = false and return
+}
+
+Double_t strawtubesHit::GetMaxTubeSagging(Float_t ID)
+{
+     if (sameSagging)
+     {
+        return maxTubeSagging;
+     }
+     else
+     {
+        return tubeSaggingMap[ID];
+     }
+}
+
+Double_t strawtubesHit::GetMaxWireSagging(Float_t ID)
+{
+     if (sameSagging)
+     {
+        return maxWireSagging;
+     }
+     else
+     {
+        return wireSaggingMap[ID];
+     }
+}
+
+Double_t strawtubesHit::FindTubeShift(Double_t x, Double_t startx, Double_t stopx, Float_t ID)
+{
+     Double_t delta = GetMaxTubeSagging(ID);
+     Double_t a = 4 * delta / TMath::Sq(startx - stopx);
+     Double_t b = 0.5 * (startx + stopx);
+     Double_t c = delta;
+     return -a * TMath::Sq(x-b) + c;
+}
+
+Double_t strawtubesHit::FindWireShift(Double_t x, Double_t startx, Double_t stopx, Float_t ID)
+{
+     Double_t delta = GetMaxWireSagging(ID);
+     Double_t a = 4 * delta / TMath::Sq(startx - stopx);
+     Double_t b = 0.5 * (startx + stopx);
+     Double_t c = delta;
+     return -a * TMath::Sq(x-b) + c;
+}
+
 void strawtubesHit::StrawEndPoints(TVector3 &vbot, TVector3 &vtop)
 {
     Int_t statnb = fDetectorID/10000000;

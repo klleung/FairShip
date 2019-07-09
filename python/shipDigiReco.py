@@ -712,7 +712,8 @@ class ShipDigiReco:
    index = 0
    hitsPerDetId = {}
    for aMCPoint in self.sTree.strawtubesPoint:
-     aHit = ROOT.strawtubesHit(aMCPoint,self.sTree.t0)
+     ROOT.strawtubesHit::InitializeMisalign();
+     aHit = ROOT.strawtubesHit(aMCPoint,self.sTree.t0,true)
      if self.digiStraw.GetSize() == index: self.digiStraw.Expand(index+1000)
      self.digiStraw[index]=aHit
      if aHit.isValid():
