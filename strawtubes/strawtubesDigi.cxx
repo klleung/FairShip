@@ -6,6 +6,7 @@ strawtubesDigi::strawtubesDigi() {
    timeDependence = new TF1("timeCoordinate_dependence", "[0]*x*x + [1]", 0., 1.);
    timeDependence->SetParameter(0, 622.8);
    timeDependence->SetParameter(1, 5.285);
+   driftTimeCalculation();
 }
 
 strawtubesDigi::strawtubesDigi(const char *function, Double_t *params) {
@@ -37,4 +38,14 @@ void strawtubesDigi::setLandauParams(Double_t p1, Double_t p2, Double_t p3, Doub
    this->p3 = p3;
    this->p4 = p4;
    this->p5 = p5;
+}
+
+Double_t strawtubesDigi::getDriftTime() {
+   driftTimeCalculation();
+   return driftTime;
+}
+
+Double_t strawtubesDigi::getRecoDist() {
+   recoDistCalculation();
+   return recoDist;
 }
