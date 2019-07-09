@@ -18,7 +18,7 @@ strawtubesDigi::strawtubesDigi(const char *function, Double_t *params) {
 strawtubesDigi::~strawtubesDigi() { }
 
 Double_t strawtubesDigi::f2calculation() {
-   Double_t f2 = p1 * Exp(-p2 * dist2Wire) + p3 * Exp(-p4 * dist2Wire) + p5;
+   Double_t f2 = p1 * TMath::Exp(-p2 * dist2Wire) + p3 * TMath::Exp(-p4 * dist2Wire) + p5;
 }
 
 void strawtubesDigi::driftTimeCalculation() {
