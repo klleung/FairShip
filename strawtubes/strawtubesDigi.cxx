@@ -18,13 +18,13 @@ strawtubesDigi::strawtubesDigi(const char *function, Double_t *params) {
 strawtubesDigi::~strawtubesDigi() { }
 
 Double_t strawtubesDigi::f2calculation() {
-   Double_t f2 = p1 * exp(-p2 * dist2Wire) + p3 * exp(-p4 * dist2Wire) + p5;
+   Double_t f2 = p1 * Exp(-p2 * dist2Wire) + p3 * Exp(-p4 * dist2Wire) + p5;
 }
 
 void strawtubesDigi::driftTimeCalculation() {
    mpvTime = timeDependence->Eval(dist2Wire);
    LandauSigma = mpvTime * f2calculation() / 100;
-   driftTime = rand->Gaus(mpvTime, LandauSigma);
+   driftTime = rand->Landau(500, LandauSigma);
 }
 
 void strawtubesDigi::recoDistCalculation(Double_t time) {
