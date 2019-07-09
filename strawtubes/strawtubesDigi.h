@@ -25,7 +25,7 @@ class strawtubesDigi {
     Double_t getRecoDist() { return recoDist; };
     Double_t getDist2Wire() { return dist2Wire; };
 
-    Double_t setDist2Wire(Double_t dist2Wire) { this->dist2Wire = dist2Wire};
+    void setDist2Wire(Double_t dist2Wire) { this->dist2Wire = dist2Wire; };
 
   private:
     TRandom *rand = new TRandom();
