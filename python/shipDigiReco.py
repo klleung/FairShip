@@ -775,7 +775,6 @@ class ShipDigiReco:
 
      # strawtubesDigi = ROOT.strawtubesDigi()
      driftTime = aDigi.GetDriftTime()
-     # smear = strawtubesDigi.getRecoDist(driftTime)
      smear = aDigi.GetSmearHit()
      if no_amb: smear = p.dist2Wire()
 
