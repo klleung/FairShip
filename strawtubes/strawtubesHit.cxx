@@ -12,8 +12,15 @@
 
 #include <iostream>
 #include <math.h>
+#include <map>
 using std::cout;
 using std::endl;
+
+Double_t strawtubesHit::maxTubeSagging;
+Double_t strawtubesHit::maxWireSagging;
+std::map<Float_t, Double_t> strawtubesHit::tubeSaggingMap;
+std::map<Float_t, Double_t> strawtubesHit::wireSaggingMap;
+bool strawtubesHit::sameSagging;
 
 Double_t speedOfLight = TMath::C() *100./1000000000.0 ; // from m/sec to cm/ns
 // -----   Default constructor   -------------------------------------------
@@ -108,6 +115,13 @@ void strawtubesHit::InitializeMisalign()
      // else
      //     read the data pair for the maps, with the (key, value) = (ID, maxSagging)
      //     set sameSagging = false and return
+}
+
+void strawtubesHit::InitializeMisalign(Double_t tubeSag, Double_t wireSag)
+{
+     maxTubeSagging = tubeSag;
+     maxWireSagging = wireSag;
+     sameSagging = true;
 }
 
 Double_t strawtubesHit::GetMaxTubeSagging(Float_t ID)

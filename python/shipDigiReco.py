@@ -711,9 +711,9 @@ class ShipDigiReco:
  # digitize FairSHiP MC hits  
    index = 0
    hitsPerDetId = {}
+   ROOT.strawtubesHit.InitializeMisalign(0.7*u.cm, 0.3*u.cm);
    for aMCPoint in self.sTree.strawtubesPoint:
-     ROOT.strawtubesHit::InitializeMisalign();
-     aHit = ROOT.strawtubesHit(aMCPoint,self.sTree.t0,true)
+     aHit = ROOT.strawtubesHit(aMCPoint,self.sTree.t0,True)
      if self.digiStraw.GetSize() == index: self.digiStraw.Expand(index+1000)
      self.digiStraw[index]=aHit
      if aHit.isValid():

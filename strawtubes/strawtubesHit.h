@@ -27,6 +27,10 @@ class strawtubesHit : public ShipHit
 /** Destructor **/
     virtual ~strawtubesHit();
 
+    // to initialize the static variable
+    static void InitializeMisalign();
+    static void InitializeMisalign(Double_t tubeSag, Double_t wireSag);
+
     /** Output to screen **/
     virtual void Print() const;
     Float_t GetTDC() const {return fdigi;}
@@ -46,7 +50,6 @@ class strawtubesHit : public ShipHit
     // static member is used as they are the "properties" of the strawtube misalignment, but not the hit object
     // but it was not defined in strawtube but in strawtubeHit, as to avoid affecting the simulation part
     // and can be initialize once only and before any instance is used
-    static void InitializeMisalign();
     static Double_t maxTubeSagging;
     static Double_t maxWireSagging;
     static std::map<Float_t, Double_t> tubeSaggingMap;
