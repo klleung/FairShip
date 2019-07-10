@@ -43,7 +43,7 @@ strawtubesHit::strawtubesHit(strawtubesPoint* p, Double_t t0)
 
      strawtubesDigi *signal = new strawtubesDigi();
      signal->setDist2Wire(p->dist2Wire());
-     driftTime = signal->DriftTime();
+     driftTime = gRandom->Landau(signal->DriftTime(), 40);
      fdigi = t0 + p->GetTime() + driftTime + (stop[0] - p->GetX()) / speedOfLight;
      smearHit = signal->getRecoDist();
      flag = true;

@@ -1,6 +1,7 @@
 #ifndef STRAWTUBESDIGI_H
 #define STRAWTUBESDIGI_H
 
+#include "TRandom.h"
 #include "TRandom3.h"
 #include "TF1.h"
 #include "TMath.h"
