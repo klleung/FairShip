@@ -27,7 +27,6 @@ class strawtubesDigi {
     void setDist2Wire(Double_t dist2Wire) { this->dist2Wire = dist2Wire; };
 
   private:
-    TRandom *rand;
     Double_t dist2Wire;
     Double_t mpvTime;               //! MPV for the Landau distribution
     Double_t LandauSigma;           //! sigma for the Landau distribution

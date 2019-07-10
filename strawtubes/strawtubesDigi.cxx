@@ -6,7 +6,7 @@ strawtubesDigi::strawtubesDigi() {
    timeDependence = new TF1("timeCoordinate_dependence", "[0]*x*x + [1]", 0., 1.);
    timeDependence->SetParameter(0, 622.8);
    timeDependence->SetParameter(1, 5.285);
-   rand = new TRandom();
+   dRandom = new TRandom3();
 }
 
 strawtubesDigi::strawtubesDigi(const char *function, Double_t *params) {
@@ -25,7 +25,7 @@ Double_t strawtubesDigi::f2calculation() {
 void strawtubesDigi::driftTimeCalculation() {
    mpvTime = timeDependence->Eval(dist2Wire);
    LandauSigma = mpvTime * f2calculation() / 100;
-   driftTime = rand->Landau(mpvTime, LandauSigma);
+   driftTime = gRandom->Landau(mpvTime, LandauSigma);
 }
 
 void strawtubesDigi::recoDistCalculation() {
