@@ -709,9 +709,10 @@ class ShipDigiReco:
        index=index+1
  def digitizeStrawTubes(self):
  # digitize FairSHiP MC hits  
+   from strawDigi_conf import StrawtubesMisalign as stm
    index = 0
    hitsPerDetId = {}
-   ROOT.strawtubesHit.InitializeMisalign(0.7*u.cm, 0.3*u.cm);
+   ROOT.strawtubesHit.InitializeMisalign(stm.maxTubeSagging, stm.maxWireSagging, ShipGeo.strawtubes.InnerStrawDiameter/2., stm.debug)
    for aMCPoint in self.sTree.strawtubesPoint:
      aHit = ROOT.strawtubesHit(aMCPoint,self.sTree.t0,True)
      if self.digiStraw.GetSize() == index: self.digiStraw.Expand(index+1000)

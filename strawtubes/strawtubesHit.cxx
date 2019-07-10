@@ -16,11 +16,13 @@
 using std::cout;
 using std::endl;
 
+Double_t strawtubesHit::tubeRadius;
 Double_t strawtubesHit::maxTubeSagging;
 Double_t strawtubesHit::maxWireSagging;
 std::map<Float_t, Double_t> strawtubesHit::tubeSaggingMap;
 std::map<Float_t, Double_t> strawtubesHit::wireSaggingMap;
 bool strawtubesHit::sameSagging;
+bool strawtubesHit::debug;
 
 Double_t speedOfLight = TMath::C() *100./1000000000.0 ; // from m/sec to cm/ns
 // -----   Default constructor   -------------------------------------------
@@ -65,13 +67,14 @@ strawtubesHit::strawtubesHit(strawtubesPoint* p, Double_t t0, bool misalign)
         // to calculate the dist2Wire under sagging, negative return means outside the tube
         TVector3 pPos = TVector3(p->GetX(), p->GetY(), p->GetZ());
         TVector3 wPos = ((start.x() - pPos.x()) * stop + (pPos.x() - stop.x()) * start) * (1./(start.x() - stop.x()));
-        Double_t r = 1.975/2.; // hard code, 
+        Double_t r = tubeRadius; 
         // need futher change, need somehow find a way to get the strawtube.InnerDiameter without changing the strawtube. part, 
         // probably will be a pass as a parameter
         // and in the pyhton part, get from some conf.py file(?)
         Double_t tubeShift = FindTubeShift(pPos.x(), start.x(), stop.x(), fDetectorID);	// defined as +ve, the magnitude
         Double_t wireShift = FindWireShift(pPos.x(), start.x(), stop.x(), fDetectorID);
 
+        if (debug){ std::cout<<"========================================================================="<<std::endl;}
         // check if the hit point is outside the tube after tube has shift
         Double_t y_prime = TMath::Sqrt(r*r - TMath::Sq(pPos.z() - wPos.z()));
         if (wPos.y() + y_prime - pPos.y() < tubeShift)
@@ -79,15 +82,31 @@ strawtubesHit::strawtubesHit(strawtubesPoint* p, Double_t t0, bool misalign)
            // outside the tube
            fdigi = -1;
            flag = false;
+           if (debug){ std::cout<<"OUT!"<<std::endl;}
         }
         else
         {
+           // this calculation has ~ 1% error
+           // as the cloest point may not have the same x as the hit point
            TVector3 delta = pPos - (wPos - TVector3(0,wireShift,0));
            Double_t dist = delta.Mag();
            Double_t t_drift = fabs( gRandom->Gaus( dist, sigma_spatial ) )/v_drift;
            fdigi = t0 + p->GetTime() + t_drift + ( stop[0]-p->GetX() )/ speedOfLight;
            flag = true;
+           if (debug)
+           {
+              std::cout<<"direct: "<<p->dist2Wire()<<std::endl;
+              std::cout<<"new   : "<<dist <<std::endl;
+              delta = pPos - wPos;
+              std::cout<<"old   : "<<delta.Mag()<<std::endl;
+              if (TMath::Abs(delta.Mag() - dist) > wireShift)
+              { 
+                 std::cout<<"BUG!"<<std::endl;
+                 std::cout<<"wireShift = "<<wireShift<<std::endl;
+              }
+           }
         }
+        if (debug){ std::cout<<"========================================================================="<<std::endl;}
      }
      else
      {
@@ -104,6 +123,8 @@ void strawtubesHit::InitializeMisalign()
      maxTubeSagging = 0.7;	// the code is using 1 cm as 1 code unit
      maxWireSagging = 0.3;
      sameSagging = true;
+     tubeRadius = 1.975/2.;
+     debug = true;
 
      // not implemented for different sagging for different tube
      // probably by the following pseudocode:
@@ -117,11 +138,18 @@ void strawtubesHit::InitializeMisalign()
      //     set sameSagging = false and return
 }
 
-void strawtubesHit::InitializeMisalign(Double_t tubeSag, Double_t wireSag)
+void strawtubesHit::InitializeMisalign(Double_t tubeSag, Double_t wireSag, Double_t r, bool inDebug)
 {
      maxTubeSagging = tubeSag;
      maxWireSagging = wireSag;
      sameSagging = true;
+     tubeRadius  = r;
+     debug = inDebug;
+     if (debug)
+     {
+        std::cout << "tubeSag = " <<  maxTubeSagging << ", wireSag = " << maxWireSagging << ", tubeRadius = " << r << std::endl;
+        std::cout << "bool = " << sameSagging << std::endl;
+     }
 }
 
 Double_t strawtubesHit::GetMaxTubeSagging(Float_t ID)
