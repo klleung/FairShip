@@ -21,10 +21,8 @@ class strawtubesDigi {
 
     void setLandauParams(Double_t p1, Double_t p2, Double_t p3, Double_t p4, Double_t p5);
 
-    Double_t getDriftTime() { return driftTime; };
     Double_t DriftTime();
-    Double_t getRecoDist(Double_t time);
-    Double_t getDist2Wire() { return dist2Wire; };
+    Double_t getRecoDist();
 
     void setDist2Wire(Double_t dist2Wire) { this->dist2Wire = dist2Wire; };
 
@@ -44,7 +42,7 @@ class strawtubesDigi {
 
     void driftTimeCalculation();
     Double_t f2calculation();       //! will return the f2 value for estimating the sigma parameter
-    void recoDistCalculation(Double_t time);
+    void recoDistCalculation();
 };
 
 

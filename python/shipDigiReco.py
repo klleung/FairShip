@@ -774,9 +774,9 @@ class ShipDigiReco:
      #     fdigi = t0 + p->GetTime() + t_drift + ( stop[0]-p->GetX() )/ speedOfLight;
 
      # strawtubesDigi = ROOT.strawtubesDigi()
-     driftTime = aDigi.GetDigi() - self.sTree.t0  - p.GetTime() - ( stop[0]-p.GetX() )/ u.speedOfLight
+     driftTime = aDigi.GetDriftTime()
      # smear = strawtubesDigi.getRecoDist(driftTime)
-     smear = p.dist2Wire()
+     smear = aDigi.GetSmearHit()
      if no_amb: smear = p.dist2Wire()
 
      SmearedHits.append( {'digiHit':key,'xtop':stop.x(),'ytop':stop.y(),'z':stop.z(),'xbot':start.x(),'ybot':start.y(),'dist':smear, 'detID':detID} )

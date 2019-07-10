@@ -30,6 +30,8 @@ class strawtubesHit : public ShipHit
     Float_t GetTDC() const {return fdigi;}
     void setInvalid() {flag = false;}
     bool isValid() const {return flag;}
+    Double_t GetSmearHit() const {return smearHit;}
+    Double_t GetDriftTime() const { return driftTime;}
 
   private:
     /** Copy constructor **/
@@ -37,6 +39,8 @@ class strawtubesHit : public ShipHit
     strawtubesHit operator=(const strawtubesHit& point);
 
     Float_t flag;   ///< flag
+    Double_t smearHit;
+    Double_t driftTime;
 
     ClassDef(strawtubesHit,3);
     
