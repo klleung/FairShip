@@ -20,8 +20,7 @@ strawtubesDigi::~strawtubesDigi() { }
 
 Double_t strawtubesDigi::f2calculation() {
    Double_t f2 = p1 * TMath::Exp(-p2 * dist2Wire) + p3 * TMath::Exp(-p4 * dist2Wire) + p5;
-
-   std::cout << f2 << std::endl;
+   return f2;
 }
 
 void strawtubesDigi::driftTimeCalculation() {
