@@ -30,6 +30,7 @@ class strawtubesHit : public ShipHit
     // to initialize the static variable
     static void InitializeMisalign();			// hard code version
     static void InitializeMisalign(Double_t tubeSag, Double_t wireSag, Double_t r, bool inDebug);
+    static void InitializeMisalign(Double_t tubeMean, Double_t tubeSigma, Double_t wireMean, Double_t wireSigma, Double_t r, bool inDebug);
 
     /** Output to screen **/
     virtual void Print() const;
@@ -53,10 +54,13 @@ class strawtubesHit : public ShipHit
     static Double_t tubeRadius;
     static Double_t maxTubeSagging;
     static Double_t maxWireSagging;
+    static Double_t tubeGausSigma;
+    static Double_t wireGausSigma;
     static std::map<Float_t, Double_t> tubeSaggingMap;
     static std::map<Float_t, Double_t> wireSaggingMap;
     static bool sameSagging;
     static bool debug;
+    static bool beingInit;
 
     Float_t flag;   ///< flag
 

@@ -712,7 +712,10 @@ class ShipDigiReco:
    from strawDigi_conf import StrawtubesMisalign as stm
    index = 0
    hitsPerDetId = {}
-   ROOT.strawtubesHit.InitializeMisalign(stm.maxTubeSagging, stm.maxWireSagging, ShipGeo.strawtubes.InnerStrawDiameter/2., stm.debug)
+   if stm.sameSagging:
+     ROOT.strawtubesHit.InitializeMisalign(stm.maxTubeSagging, stm.maxWireSagging, ShipGeo.strawtubes.InnerStrawDiameter/2., stm.debug)
+   else:
+     ROOT.strawtubesHit.InitializeMisalign(stm.maxTubeSagging, stm.tubeGausSigma, stm.maxWireSagging, stm.wireGausSigma, ShipGeo.strawtubes.InnerStrawDiameter/2., stm.debug)
    for aMCPoint in self.sTree.strawtubesPoint:
      aHit = ROOT.strawtubesHit(aMCPoint,self.sTree.t0,True)
      if self.digiStraw.GetSize() == index: self.digiStraw.Expand(index+1000)
