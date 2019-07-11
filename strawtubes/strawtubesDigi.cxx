@@ -20,13 +20,14 @@ strawtubesDigi::~strawtubesDigi() { }
 
 Double_t strawtubesDigi::f2calculation() {
    Double_t f2 = p1 * TMath::Exp(-p2 * dist2Wire) + p3 * TMath::Exp(-p4 * dist2Wire) + p5;
+
+   std::cout << f2 << std::endl;
 }
 
 void strawtubesDigi::driftTimeCalculation() {
    mpvTime = timeDependence->Eval(dist2Wire);
    LandauSigma = mpvTime * f2calculation() / 100;
    driftTime = rand->Gaus(mpvTime, LandauSigma);
-   std::cout << "sigma " << LandauSigma << "MPV " << mpvTime << std::endl;
 }
 
 void strawtubesDigi::recoDistCalculation() {
