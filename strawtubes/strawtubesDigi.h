@@ -38,7 +38,7 @@ class strawtubesDigi {
     Double_t p4 = 23.92;
     Double_t p5 = 0.419;
     Double_t recoDist;
-    TRandom *rand;
+    TRandom *rand = new TRandom();;
 
     void driftTimeCalculation();
     Double_t f2calculation();       //! will return the f2 value for estimating the sigma parameter
