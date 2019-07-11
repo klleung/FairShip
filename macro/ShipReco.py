@@ -162,7 +162,7 @@ SHiP = shipDigiReco.ShipDigiReco(outFile,fgeo)
 nEvents   = min(SHiP.sTree.GetEntries(),nEvents)
 # main loop
 for iEvent in range(firstEvent, nEvents):
- if iEvent%1000 == 0 or debug: print 'event ',iEvent
+ if iEvent%100 == 0 or debug: print 'event ',iEvent
  rc    = SHiP.sTree.GetEvent(iEvent) 
  SHiP.digitize()
  SHiP.reconstruct()
