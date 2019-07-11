@@ -11,9 +11,6 @@ strawtubesDigi::strawtubesDigi() {
 
 strawtubesDigi::strawtubesDigi(const char *function, Double_t *params) {
 
-   /**
-    * Here will be realized a method which support the user time-coordinate dependence function in TF1 format
-    */
 }
 
 strawtubesDigi::~strawtubesDigi() { }
@@ -26,7 +23,7 @@ Double_t strawtubesDigi::f2calculation() {
 void strawtubesDigi::driftTimeCalculation() {
    mpvTime = timeDependence->Eval(dist2Wire);
    LandauSigma = mpvTime * f2calculation() / 100;
-   driftTime = rand->Gaus(mpvTime, LandauSigma);
+   driftTime = rand->Landau(mpvTime, LandauSigma);
 }
 
 void strawtubesDigi::recoDistCalculation() {
