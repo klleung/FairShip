@@ -779,7 +779,7 @@ class ShipDigiReco:
      MPV_time = f1
      sigma_time = MPV_time * f2 / 100
      driftTime = ROOT.gRandom.Gaus(MPV_time, sigma_time)
-     print 'driftTime = ', driftTime, '  dist2Wire ', dist
+     print 'driftTimePY = ', driftTime, '  dist2Wire ', dist
      driftTimecxx = aDigi.GetDriftTime()
      smear = aDigi.GetSmearHit()
      if no_amb: smear = p.dist2Wire()
