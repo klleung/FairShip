@@ -778,16 +778,16 @@ class ShipDigiReco:
      f2 = 8.52 * ROOT.TMath.Exp(-4.66 * dist) + 31.81 * ROOT.TMath.Exp(-23.92 * dist) + 0.419
      MPV_time = f1
      sigma_time = MPV_time * f2 / 100
-     # driftTime = ROOT.gRandom.Gaus(MPV_time, sigma_time)
-     print 'sigma py = ', sigma_time
-     driftTime = aDigi.GetDriftTime()
+     driftTime = ROOT.gRandom.Gaus(MPV_time, sigma_time)
+     print 'driftTime = ', driftTime, '  dist2Wire ', dist
+     driftTimecxx = aDigi.GetDriftTime()
      smear = aDigi.GetSmearHit()
      if no_amb: smear = p.dist2Wire()
 
      SmearedHits.append( {'digiHit':key,'xtop':stop.x(),'ytop':stop.y(),'z':stop.z(),'xbot':start.x(),'ybot':start.y(),'dist':smear, 'detID':detID} )
      # Note: top.z()==bot.z() unless misaligned, so only add key 'z' to smearedHit
 
-     h['vshape'].Fill(p.dist2Wire(), driftTime)
+     h['vshape'].Fill(p.dist2Wire(), driftTimecxx)
 
 
      if abs(stop.y())==abs(start.y()): h['disty'].Fill(smear)
