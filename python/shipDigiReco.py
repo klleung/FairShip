@@ -773,13 +773,13 @@ class ShipDigiReco:
      # use true t0  construction: 
      #     fdigi = t0 + p->GetTime() + t_drift + ( stop[0]-p->GetX() )/ speedOfLight;
 
-     dist = p.dist2Wire()
-     f1 = 622.8 * dist ** 2 + 5.285
-     f2 = 8.52 * ROOT.TMath.Exp(-4.66 * dist) + 31.81 * ROOT.TMath.Exp(-23.92 * dist) + 0.419
-     MPV_time = f1
-     sigma_time = MPV_time * f2 / 100
-     driftTime = ROOT.gRandom.Landau(MPV_time, sigma_time)
-     driftTimecxx = aDigi.GetDriftTime()
+     # dist = p.dist2Wire()
+     # f1 = 622.8 * dist ** 2 + 5.285
+     # f2 = 8.52 * ROOT.TMath.Exp(-4.66 * dist) + 31.81 * ROOT.TMath.Exp(-23.92 * dist) + 0.419
+     # MPV_time = f1
+     # sigma_time = MPV_time * f2 / 100
+     # driftTime = ROOT.gRandom.Landau(MPV_time, sigma_time)
+     driftTime = aDigi.GetDriftTime()
      # print 'driftTimePY = ', driftTime, '  driftTimeCXX = ', driftTimecxx, '  dist2Wire ', dist
      smear = aDigi.GetSmearHit()
      if no_amb: smear = p.dist2Wire()
