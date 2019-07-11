@@ -778,10 +778,11 @@ class ShipDigiReco:
      f2 = 8.52 * ROOT.TMath.Exp(-4.66 * dist) + 31.81 * ROOT.TMath.Exp(-23.92 * dist) + 0.419
      MPV_time = f1
      sigma_time = MPV_time * f2 / 100
-     driftTime = ROOT.gRandom.Gaus(MPV_time, sigma_time)
-     print sigma_time
+     # driftTime = ROOT.gRandom.Gaus(MPV_time, sigma_time)
+     print sigma_time, ' MPV ', MPV_time
 
-     # driftTime = aDigi.GetDriftTime()
+
+     driftTime = aDigi.GetDriftTime()
      smear = aDigi.GetSmearHit()
      if no_amb: smear = p.dist2Wire()
 
