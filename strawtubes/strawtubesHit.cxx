@@ -41,11 +41,13 @@ strawtubesHit::strawtubesHit(strawtubesPoint* p, Double_t t0)
      module->StrawEndPoints(fDetectorID,start,stop);
 
 //     signal->setDist2Wire(p->dist2Wire());
+     strawtubesDigi *signal = new strawtubesDigi();
      signal->setDist2Wire(0.23456);
      driftTime = signal->DriftTime();
      fdigi = t0 + p->GetTime() + driftTime + (stop[0] - p->GetX()) / speedOfLight;
      smearHit = signal->getRecoDist();
      flag = true;
+     delete signal;
 }
 void strawtubesHit::StrawEndPoints(TVector3 &vbot, TVector3 &vtop)
 {

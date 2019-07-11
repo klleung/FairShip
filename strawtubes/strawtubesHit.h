@@ -39,8 +39,6 @@ class strawtubesHit : public ShipHit
     strawtubesHit(const strawtubesHit& point);
     strawtubesHit operator=(const strawtubesHit& point);
 
-    strawtubesDigi *signal = new strawtubesDigi();
-
     Float_t flag;   ///< flag
     Double_t smearHit;
     Double_t driftTime;
