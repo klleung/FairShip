@@ -1,6 +1,5 @@
 #include "strawtubesHit.h"
 #include "strawtubes.h"
-#include "strawtubesDigi.h"
 #include "TVector3.h"
 #include "FairRun.h"
 #include "FairRunSim.h"

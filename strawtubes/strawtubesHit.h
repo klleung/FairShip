@@ -4,6 +4,7 @@
 
 #include "ShipHit.h"
 #include "strawtubesPoint.h"
+#include "strawtubesDigi.h"
 #include "TObject.h"
 #include "TVector3.h"
 
