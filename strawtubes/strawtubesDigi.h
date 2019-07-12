@@ -9,9 +9,10 @@
 
 class strawtubesDigi {
   public:
-    strawtubesDigi();
-    strawtubesDigi(const char* function, Double_t *params);
-    virtual ~strawtubesDigi();
+    static strawtubesDigi& Instance() {
+       static strawtubesDigi singleton;
+       return singleton;
+    }
 
 /**
  * This function sets user parameters for the time signal parametrization (via Landau)
@@ -21,12 +22,18 @@ class strawtubesDigi {
 
     void setLandauParams(Double_t p1, Double_t p2, Double_t p3, Double_t p4, Double_t p5);
 
-    Double_t DriftTime();
+    Double_t DriftTime(Double_t dist2Wire);
     Double_t getRecoDist();
 
-    void setDist2Wire(Double_t dist2Wire) { this->dist2Wire = dist2Wire; };
 
   private:
+    strawtubesDigi();
+    strawtubesDigi(TF1 *timeCoordinate_dependence);
+    virtual ~strawtubesDigi();
+    strawtubesDigi(const strawtubesDigi&);
+    strawtubesDigi& operator = (const strawtubesDigi&);
+
+
     Double_t dist2Wire;
     Double_t mpvTime;               //! MPV for the Landau distribution
     Double_t LandauSigma;           //! sigma for the Landau distribution
@@ -43,6 +50,7 @@ class strawtubesDigi {
     void driftTimeCalculation();
     Double_t f2calculation();       //! will return the f2 value for estimating the sigma parameter
     void recoDistCalculation();
+    void default_recoDistCalculation();
 };
 
 

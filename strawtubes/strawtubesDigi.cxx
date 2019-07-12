@@ -8,8 +8,10 @@ strawtubesDigi::strawtubesDigi() {
    timeDependence->SetParameter(1, 5.285);
 }
 
-strawtubesDigi::strawtubesDigi(const char *function, Double_t *params) {
-
+strawtubesDigi::strawtubesDigi(TF1 *timeCoordinate_dependence) {
+   mpvTime = 0;
+   LandauSigma = 0;
+   timeDependence = timeCoordinate_dependence;
 }
 
 strawtubesDigi::~strawtubesDigi() { }
@@ -31,6 +33,10 @@ void strawtubesDigi::recoDistCalculation() {
    recoDist = timeDependence->GetX(driftTime, 0., 1.);
 }
 
+void strawtubesDigi::default_recoDistCalculation() {
+   recoDist = TMath::Sqrt(TMath::Abs(driftTime - timeDependence->GetParameter(0)) / timeDependence->GetParameter(1))
+}
+
 void strawtubesDigi::setLandauParams(Double_t p1, Double_t p2, Double_t p3, Double_t p4, Double_t p5) {
    this->p1 = p1;
    this->p2 = p2;
@@ -39,12 +45,14 @@ void strawtubesDigi::setLandauParams(Double_t p1, Double_t p2, Double_t p3, Doub
    this->p5 = p5;
 }
 
-Double_t strawtubesDigi::DriftTime() {
+Double_t strawtubesDigi::DriftTime(Double_t dist2Wire) {
+   this->dist2Wire = dist2Wire;
    driftTimeCalculation();
    return driftTime;
 }
 
 Double_t strawtubesDigi::getRecoDist() {
-   recoDistCalculation();
+//   recoDistCalculation();
+   default_recoDistCalculation()
    return recoDist;
 }
