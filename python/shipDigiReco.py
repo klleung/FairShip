@@ -773,7 +773,7 @@ class ShipDigiReco:
      # use true t0  construction: 
      #     fdigi = t0 + p->GetTime() + t_drift + ( stop[0]-p->GetX() )/ speedOfLight;
 
-     driftTime = ROOT.strawtubesDigi.Instance().DriftTime(p.dist2Wire())
+     driftTime = ROOT.strawtubesDigi.Instance().GetDriftTime()
      smear = ROOT.strawtubesDigi.Instance().RecoDist()
      if no_amb: smear = p.dist2Wire()
 

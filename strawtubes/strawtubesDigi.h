@@ -23,6 +23,7 @@ class strawtubesDigi {
 
     Double_t DriftTime(Double_t dist2Wire);
     Double_t RecoDist();
+    Double_t GetDriftTime() { return driftTime; };
 
 
   private:
