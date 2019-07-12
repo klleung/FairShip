@@ -44,7 +44,6 @@ strawtubesHit::strawtubesHit(strawtubesPoint* p, Double_t t0)
      fdigi = t0 + p->GetTime() + driftTime + (stop[0] - p->GetX()) / speedOfLight;
      smearHit = strawtubesDigi::Instance().getRecoDist();
      flag = true;
-     delete signal;
 }
 void strawtubesHit::StrawEndPoints(TVector3 &vbot, TVector3 &vtop)
 {
