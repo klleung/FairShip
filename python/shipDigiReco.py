@@ -781,6 +781,7 @@ class ShipDigiReco:
      # Note: top.z()==bot.z() unless misaligned, so only add key 'z' to smearedHit
 
      h['vshape'].Fill(p.dist2Wire(), driftTime)
+     h['recoDist'].Fill(smear, p.dist2Wire())
 
 
      if abs(stop.y())==abs(start.y()): h['disty'].Fill(smear)
