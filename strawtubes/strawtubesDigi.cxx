@@ -55,7 +55,7 @@ Double_t strawtubesDigi::DriftTime(Double_t dist2Wire) {
 }
 
 Double_t strawtubesDigi::RecoDist() {
-//    recoDistCalculation();
-    default_recoDistCalculation();
+    recoDistCalculation();
+//    default_recoDistCalculation();
     return recoDist;
 }
