@@ -25,8 +25,6 @@ void strawtubesDigi::driftTimeCalculation() {
    mpvTime = timeDependence->Eval(dist2Wire);
    LandauSigma = mpvTime * f2calculation() / 100;
    driftTime = rand->Landau(mpvTime, LandauSigma);
-
-   std::cout << mpvTime << " " << LandauSigma << " " << driftTime << std::endl;
 }
 
 void strawtubesDigi::recoDistCalculation() {
@@ -51,7 +49,7 @@ Double_t strawtubesDigi::DriftTime(Double_t dist2Wire) {
    return driftTime;
 }
 
-Double_t strawtubesDigi::getRecoDist() {
+Double_t strawtubesDigi::RecoDist() {
 //   recoDistCalculation();
    default_recoDistCalculation();
    return recoDist;
