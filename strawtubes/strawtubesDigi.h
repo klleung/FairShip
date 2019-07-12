@@ -44,7 +44,7 @@ class strawtubesDigi {
     Double_t p4 = 23.92;
     Double_t p5 = 0.419;
     Double_t recoDist;                  //! Reconstructed distance to the Wire after drift time smearing
-    TRandom *rand = new TRandom();;
+    TRandom3 *rand;
 
     void driftTimeCalculation();        //! Calculates the drift time from input distance to the wire
     Double_t f2calculation();           //! Returns the f2 value for estimating the sigma parameter

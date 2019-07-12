@@ -6,6 +6,7 @@ strawtubesDigi::strawtubesDigi() {
    timeDependence = new TF1("timeCoordinate_dependence", "[0]*x*x + [1]", 0., 1.);
    timeDependence->SetParameter(0, 622.8);
    timeDependence->SetParameter(1, 5.285);
+   rand = new TRandom3();
 }
 
 strawtubesDigi::strawtubesDigi(TF1 *timeCoordinate_dependence) {
