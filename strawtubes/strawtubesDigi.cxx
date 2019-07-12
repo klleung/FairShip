@@ -33,7 +33,9 @@ void strawtubesDigi::recoDistCalculation() {
 }
 
 void strawtubesDigi::default_recoDistCalculation() {
-   recoDist = TMath::Sqrt(TMath::Abs(driftTime - timeDependence->GetParameter(0)) / timeDependence->GetParameter(1));
+//   recoDist = TMath::Sqrt(TMath::Abs(driftTime - timeDependence->GetParameter(0)) / timeDependence->GetParameter(1));
+
+    recoDist = sqrt(abs(driftTime - 5.285) / 622.8);
 }
 
 void strawtubesDigi::setLandauParams(Double_t p1, Double_t p2, Double_t p3, Double_t p4, Double_t p5) {
