@@ -33,7 +33,9 @@ void strawtubesDigi::recoDistCalculation() {
 }
 
 void strawtubesDigi::default_recoDistCalculation() {
-    recoDist = sqrt(abs(driftTime - timeDependence->GetParameter(0)) / timeDependence->GetParameter(1));
+    Double_t p0 = timeDependence->GetParameter(0);
+    Double_t p1 = timeDependence->GetParameter(1);
+    recoDist = sqrt(abs(driftTime - p0) / p1);
 
 //    recoDist = sqrt(abs(driftTime - 5.285) / 622.8);
 }
