@@ -31,8 +31,6 @@ class strawtubesHit : public ShipHit
     Float_t GetTDC() const {return fdigi;}
     void setInvalid() {flag = false;}
     bool isValid() const {return flag;}
-    Double_t GetSmearHit() const {return smearHit;}
-    Double_t GetDriftTime() const { return driftTime;}
 
   private:
     /** Copy constructor **/
