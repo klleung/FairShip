@@ -116,9 +116,9 @@ ecalGeoFile = ShipGeo.ecal.File
 h={}
 log={}
 if withHists:
- ut.bookHist(h,'distu','distance to wire',100,0.,5.)
- ut.bookHist(h,'distv','distance to wire',100,0.,5.)
- ut.bookHist(h,'disty','distance to wire',100,0.,5.)
+ ut.bookHist(h,'distu','distance to wire',100,0.,2.)
+ ut.bookHist(h,'distv','distance to wire',100,0.,2.)
+ ut.bookHist(h,'disty','distance to wire',100,0.,2.)
  ut.bookHist(h,'nmeas','nr measuerements',100,0.,50.)
  ut.bookHist(h,'chi2','Chi2/DOF',100,0.,20.)
 
@@ -166,6 +166,14 @@ for iEvent in range(firstEvent, nEvents):
  SHiP.digitize()
  SHiP.reconstruct()
  # memory monitoring
- # mem_monitor() 
+ # mem_monitor()
+ut.bookCanvas(h, key='dist2Wire', title='dist2Wire', nx = 1200, ny = 600, cx = 3, cy =1)
+cv = h['dist2Wire'].cd(1)
+h['disty'].Draw()
+cv = h['dist2Wire'].cd(2)
+h['distu'].Draw() 
+cv = h['dist2Wire'].cd(3)
+h['distv'].Draw() 
+h['dist2Wire'].Print('dist2Wire.gif')
 # end loop over events
 SHiP.finish()

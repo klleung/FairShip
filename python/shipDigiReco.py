@@ -717,7 +717,7 @@ class ShipDigiReco:
    else:
      ROOT.strawtubesHit.InitializeMisalign(stm.maxTubeSagging, stm.tubeGausSigma, stm.maxWireSagging, stm.wireGausSigma, ShipGeo.strawtubes.InnerStrawDiameter/2., stm.debug)
    for aMCPoint in self.sTree.strawtubesPoint:
-     aHit = ROOT.strawtubesHit(aMCPoint,self.sTree.t0,True)
+     aHit = ROOT.strawtubesHit(aMCPoint,self.sTree.t0,stm.misalign)
      if self.digiStraw.GetSize() == index: self.digiStraw.Expand(index+1000)
      self.digiStraw[index]=aHit
      if aHit.isValid():

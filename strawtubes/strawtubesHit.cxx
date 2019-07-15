@@ -102,6 +102,13 @@ strawtubesHit::strawtubesHit(strawtubesPoint* p, Double_t t0, bool misalign)
               std::cout<<"new   : "<<dist <<std::endl;
               delta = pPos - wPos;
               std::cout<<"old   : "<<delta.Mag()<<std::endl;
+              std::cout<<"pos  :("<<pPos.x()<<", "<<pPos.y()<<", "<<pPos.z()<<" )"<<std::endl;
+              std::cout<<"start:("<<start.x()<<", "<<start.y()<<", "<<start.z()<<" )"<<std::endl;
+              std::cout<<"stop :("<<stop.x()<<", "<<stop.y()<<", "<<stop.z()<<" )"<<std::endl;
+              if (TMath::Abs(delta.Mag()/p->dist2Wire()) > 1.006)
+              {
+                 std::cout<<"ERROR!"<<std::endl;
+              }
               if (TMath::Abs(delta.Mag() - dist) > wireShift)
               { 
                  std::cout<<"BUG!"<<std::endl;
@@ -116,6 +123,13 @@ strawtubesHit::strawtubesHit(strawtubesPoint* p, Double_t t0, bool misalign)
         Double_t t_drift = fabs( gRandom->Gaus( p->dist2Wire(), sigma_spatial ) )/v_drift;
         fdigi = t0 + p->GetTime() + t_drift + ( stop[0]-p->GetX() )/ speedOfLight;
         flag = true;
+        if (debug)
+        {
+           std::cout<<"direct: "<<p->dist2Wire()<<std::endl;
+           std::cout<<"pos  :("<<p->GetX()<<", "<<p->GetY()<<", "<<p->GetZ()<<" )"<<std::endl;
+           std::cout<<"start:("<<start.x()<<", "<<start.y()<<", "<<start.z()<<" )"<<std::endl;
+           std::cout<<"stop :("<<stop.x()<<", "<<stop.y()<<", "<<stop.z()<<" )"<<std::endl;
+        }
      }
 }
 
@@ -164,12 +178,12 @@ void strawtubesHit::InitializeMisalign(Double_t tubeMean, Double_t tubeSigma, Do
 
         if (debug)
         {
-           std::cout << "tubeSag = " << maxTubeSagging << ", wireSag = " << maxWireSagging << ", tubeRadius = " << r << std::endl;
-           std::cout << "tubeSigma = " << tubeGausSigma << ", wireSigma = " << wireGausSigma << std::endl;
-           std::cout << "bool = " << sameSagging << std::endl;
+           std::cout << "tubeSag   = " << maxTubeSagging << ", wireSag   = " << maxWireSagging << ", tubeRadius = " << r << std::endl;
+           std::cout << "tubeSigma = " << tubeGausSigma <<  ", wireSigma = " << wireGausSigma << std::endl;
+           std::cout << "sameSag   = " << sameSagging << std::endl;
+           std::cout << "Input a int to continue" << std::endl;
            // to ensure initialize once, not just beingInit, but should be only on screen once
            // avoid redefine the tube's sagging
-           std::cout << "Input a int to continue" << std::endl;
            int dummy;
            std::cin >> dummy;
         }
