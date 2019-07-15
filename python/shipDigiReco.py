@@ -777,7 +777,7 @@ class ShipDigiReco:
      strawTime = p.GetTime()
      electronicsTime = (stop[0]-p.GetX()) / u.speedOfLight
      driftTime = ROOT.strawtubesDigi.Instance().DriftTimeFromTDC(TDC, t0, strawTime, electronicsTime)
-     smear = ROOT.strawtubesDigi.NewDist2WireFromDriftTime(driftTime)
+     smear = ROOT.strawtubesDigi.Instance().NewDist2WireFromDriftTime(driftTime)
      if no_amb: smear = p.dist2Wire()
 
      SmearedHits.append( {'digiHit':key,'xtop':stop.x(),'ytop':stop.y(),'z':stop.z(),'xbot':start.x(),'ybot':start.y(),'dist':smear, 'detID':detID} )
