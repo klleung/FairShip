@@ -47,9 +47,9 @@ class strawtubesDigi {
     TRandom3 *rand;
 
     void driftTimeCalculation(Double_t dist2Wire);        //! Calculates the drift time from input distance to the wire
-    Double_t f2calculation(Double_t dist2Wire);           //! Returns the f2 value for estimating the sigma parameter
-    void recoDistCalculation();         //! Calculates distance to the wire after drift time smearing for the user time-coordinate dependence function
-    void default_recoDistCalculation(); //! Calculates distance to the wire after drift time smearing for the default time-coordinate dependence function
+
+    void NewDist2WireCalculation(Double_t driftTime);         //! Calculates distance to the wire after drift time smearing for the user time-coordinate dependence function
+    void default_NewDist2WireCalculation(Double_t driftTime); //! Calculates distance to the wire after drift time smearing for the default time-coordinate dependence function
 };
 
 
