@@ -40,9 +40,8 @@ strawtubesHit::strawtubesHit(strawtubesPoint* p, Double_t t0)
      Double_t sigma_spatial = module->StrawSigmaSpatial();
      module->StrawEndPoints(fDetectorID,start,stop);
 
-     driftTime = strawtubesDigi::Instance().DriftTime(p->dist2Wire());
+     driftTime = strawtubesDigi::Instance().DriftTimeFromDist2Wire(p->dist2Wire());
      fdigi = t0 + p->GetTime() + driftTime + (stop[0] - p->GetX()) / speedOfLight;
-     smearHit = strawtubesDigi::Instance().RecoDist();
      flag = true;
 }
 void strawtubesHit::StrawEndPoints(TVector3 &vbot, TVector3 &vtop)
