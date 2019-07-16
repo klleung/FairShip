@@ -6,7 +6,7 @@
 #include "TF1.h"
 #include "TMath.h"
 
-
+// test of pull request
 class strawtubesDigi {
   public:
     static strawtubesDigi& Instance() {
