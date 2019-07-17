@@ -101,7 +101,7 @@ Double_t strawtubesDigi::GetMaxTubeSagging(Float_t ID)
     }
     else
     {
-       if (tubeSaggingMap[ID] == 0)
+       if (tubeSaggingMap.count(ID) == 0)
        {
           tubeSaggingMap[ID] = gRandom->Gaus(maxTubeSagging, tubeGausSigma);
           if (tubeSaggingMap[ID] < 0){ tubeSaggingMap[ID] = 0;}
@@ -118,7 +118,7 @@ Double_t strawtubesDigi::GetMaxWireSagging(Float_t ID)
     }
     else
     {
-       if (wireSaggingMap[ID] == 0)
+       if (wireSaggingMap.count(ID) == 0)
        {
           wireSaggingMap[ID] = gRandom->Gaus(maxWireSagging, wireGausSigma);
           if (wireSaggingMap[ID] < 0){ wireSaggingMap[ID] = 0;}
