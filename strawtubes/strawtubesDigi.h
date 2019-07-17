@@ -5,7 +5,8 @@
 #include "TRandom3.h"
 #include "TF1.h"
 #include "TMath.h"
-
+#include "TVector3.h"
+#include <map>
 
 class strawtubesDigi {
   public:
@@ -25,6 +26,12 @@ class strawtubesDigi {
     Double_t NewDist2WireFromDriftTime(Double_t driftTime);
     Double_t DriftTimeFromTDC(Double_t TDC, Double_t t0, Double_t strawTime, Double_t electronicsTime);
 
+    // to set the parameter of misalignment, different input refer to different case (uniform sagging or not)
+    void InitializeMisalign(Double_t tubeSag, Double_t wireSag, Double_t r, bool inDebug); 
+    void InitializeMisalign(Double_t tubeMean, Double_t tubeSigma, Double_t wireSigma, Double_t wireMean, Double_t r, bool inDebug); 
+    bool CheckInTube(TVector3 pPos, TVector3 start, TVector3 stop, Float_t ID);
+    Double_t FindMisalignDist2Wire(TVector3 pPos, TVector3 start, TVector3 stop, Float_t ID);
+    bool IsMisalign() {return misalign;}
 
   private:
     strawtubesDigi();
@@ -50,6 +57,24 @@ class strawtubesDigi {
 
     void NewDist2WireCalculation(Double_t driftTime);         //! Calculates distance to the wire after drift time smearing for the user time-coordinate dependence function
     void default_NewDist2WireCalculation(Double_t driftTime); //! Calculates distance to the wire after drift time smearing for the default time-coordinate dependence function
+
+    // Misalignment part
+    Double_t tubeRadius;
+    Double_t maxTubeSagging;
+    Double_t maxWireSagging;
+    Double_t tubeGausSigma;
+    Double_t wireGausSigma;
+    std::map<Float_t, Double_t> tubeSaggingMap;
+    std::map<Float_t, Double_t> wireSaggingMap;
+    bool misalign = false;
+    bool uniformSagging = true;
+    bool debug = false;
+    bool beingInit = false;
+
+    Double_t FindTubeShift(Double_t x, Double_t startx, Double_t stopx, Float_t ID);
+    Double_t FindWireShift(Double_t x, Double_t startx, Double_t stopx, Float_t ID);
+    Double_t GetMaxTubeSagging(Float_t ID);
+    Double_t GetMaxWireSagging(Float_t ID);
 };
 
 

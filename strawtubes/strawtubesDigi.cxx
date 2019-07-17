@@ -61,3 +61,118 @@ Double_t strawtubesDigi::DriftTimeFromTDC(Double_t TDC, Double_t t0, Double_t st
   return TDC - t0 - strawTime - electronicsTime;
 
 }
+
+// For the Misalignment part
+void strawtubesDigi::InitializeMisalign(Double_t tubeSag, Double_t wireSag, Double_t r, bool inDebug) 
+{
+    if (not(beingInit))
+    {
+       maxTubeSagging = tubeSag;
+       maxWireSagging = wireSag;
+       tubeRadius = r;
+       debug = inDebug;
+       uniformSagging = true;
+       misalign = true;
+       beingInit = true;
+    }
+}
+
+void strawtubesDigi::InitializeMisalign(Double_t tubeMean, Double_t tubeSigma, Double_t wireSigma, Double_t wireMean, Double_t r, bool inDebug)
+{
+    if (not(beingInit))
+    {
+       maxTubeSagging = tubeMean;
+       tubeGausSigma = tubeSigma;
+       maxWireSagging = wireMean;
+       wireGausSigma = wireSigma;
+       tubeRadius = r;
+       debug = inDebug;
+       uniformSagging = false;
+       misalign = true;
+       beingInit = true;
+    }
+}
+
+Double_t strawtubesDigi::GetMaxTubeSagging(Float_t ID)
+{
+    if (uniformSagging)
+    {
+       return maxTubeSagging;
+    }
+    else
+    {
+       if (tubeSaggingMap.count(ID) == 0)
+       {
+          tubeSaggingMap[ID] = gRandom->Gaus(maxTubeSagging, tubeGausSigma);
+          if (tubeSaggingMap[ID] < 0){ tubeSaggingMap[ID] = 0;}
+       }
+       return tubeSaggingMap[ID];
+    }
+}
+
+Double_t strawtubesDigi::GetMaxWireSagging(Float_t ID)
+{
+    if (uniformSagging)
+    {
+       return maxWireSagging;
+    }
+    else
+    {
+       if (wireSaggingMap.count(ID) == 0)
+       {
+          wireSaggingMap[ID] = gRandom->Gaus(maxWireSagging, wireGausSigma);
+          if (wireSaggingMap[ID] < 0){ wireSaggingMap[ID] = 0;}
+       }
+       return wireSaggingMap[ID];
+    }
+}
+
+Double_t strawtubesDigi::FindTubeShift(Double_t x, Double_t startx, Double_t stopx, Float_t ID)
+{
+    Double_t delta = GetMaxTubeSagging(ID);
+    Double_t a = -4. * delta / TMath::Sq(startx - stopx);
+    Double_t b = 0.5 * (startx + stopx);
+    Double_t c = delta;
+
+    return a * TMath::Sq(x-b) + c;
+}
+
+Double_t strawtubesDigi::FindWireShift(Double_t x, Double_t startx, Double_t stopx, Float_t ID)
+{
+    Double_t delta = GetMaxWireSagging(ID);
+    Double_t a = -4. * delta / TMath::Sq(startx - stopx);
+    Double_t b = 0.5 * (startx + stopx);
+    Double_t c = delta;
+
+    return a * TMath::Sq(x-b) + c;
+}
+
+bool strawtubesDigi::CheckInTube(TVector3 pPos, TVector3 start, TVector3 stop, Float_t ID)
+{
+    Double_t tubeShift = FindTubeShift(pPos.x(), start.x(), stop.x(), ID);
+    TVector3 wPos = ((start.x() - pPos.x()) * stop + (pPos.x() - stop.x()) * start) * (1./(start.x() - stop.x()));
+
+    Double_t r = tubeRadius;
+    Double_t theta = TMath::ATan((start.y() - stop.y())/(start.x()-stop.x()));
+    Double_t dz = pPos.z() - wPos.z();
+    Double_t h = TMath::Sqrt(r*r-dz*dz)/TMath::Cos(theta);
+
+    if ((h - (pPos.y()-wPos.y())) < tubeShift)
+    {
+       if (debug){ std::cout<<"OutOfTube"<<std::endl; }
+       return false;
+    }
+    return true;
+}
+
+Double_t strawtubesDigi::FindMisalignDist2Wire(TVector3 pPos, TVector3 start, TVector3 stop, Float_t ID)
+{
+    // Approimate version
+    TVector3 wPos = ((start.x() - pPos.x()) * stop + (pPos.x() - stop.x()) * start) * (1./(start.x() - stop.x()));
+    Double_t wireShift = FindWireShift(pPos.x(), start.x(), stop.x(), ID);
+    TVector3 dr = pPos - (wPos - TVector3(0,wireShift,0));
+    return dr.Mag();
+
+    // Another method, by using TF1 to find inverse function and minimize
+}
+
