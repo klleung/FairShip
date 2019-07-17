@@ -766,9 +766,7 @@ class ShipDigiReco:
   z1 = stop.z()
   for aDigi in self.digiStraw:
      key+=1
-     if not aDigi.isValid():
-       print "skipped invalid"
-       continue
+     if not aDigi.isValid(): continue
      detID = aDigi.GetDetectorID()
 # don't use hits from straw veto
      station = int(detID/10000000)
@@ -794,10 +792,9 @@ class ShipDigiReco:
      h['vshape'].Fill(p.dist2Wire(), driftTime)
      h['recoDist'].Fill(smear, p.dist2Wire())
 
-     if smear > 0:
-       if abs(stop.y())==abs(start.y()): h['disty'].Fill(smear)
-       if abs(stop.y())>abs(start.y()): h['distu'].Fill(smear)
-       if abs(stop.y())<abs(start.y()): h['distv'].Fill(smear)
+     if abs(stop.y())==abs(start.y()): h['disty'].Fill(smear)
+     if abs(stop.y())>abs(start.y()): h['distu'].Fill(smear)
+     if abs(stop.y())<abs(start.y()): h['distv'].Fill(smear)
 
   return SmearedHits
   
