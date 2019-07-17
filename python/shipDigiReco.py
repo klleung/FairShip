@@ -709,6 +709,12 @@ class ShipDigiReco:
        index=index+1
  def digitizeStrawTubes(self):
  # digitize FairSHiP MC hits  
+   from strawDigi_conf import StrawtubesMisalign as stm
+   if stm.misalign:
+     if stm.sameSagging:
+       ROOT.strawtubesDigi.Instance().InitializeMisalign(stm.maxTubeSagging,stm.maxWireSagging,ShipGeo.strawtubes.InnerStrawDiameter/2.,stm.debug);
+     else:
+       ROOT.strawtubesDigi.Instance().InitializeMisalign(stm.maxTubeSagging,stm.tubeGausSigma,stm.maxWireSagging,stm.wireGausSigma,ShipGeo.strawtubes.InnerStrawDiameter/2.,stm.debug);
    index = 0
    hitsPerDetId = {}
    for aMCPoint in self.sTree.strawtubesPoint:
@@ -735,7 +741,7 @@ class ShipDigiReco:
   z1 = stop.z()
   for aDigi in self.digiStraw:
     key+=1
-    if not aDigi.isValid: continue
+    if not aDigi.isValid(): continue
     detID = aDigi.GetDetectorID()
 # don't use hits from straw veto
     station = int(detID/10000000)
@@ -760,7 +766,7 @@ class ShipDigiReco:
   z1 = stop.z()
   for aDigi in self.digiStraw:
      key+=1
-     if not aDigi.isValid: continue
+     if not aDigi.isValid(): continue
      detID = aDigi.GetDetectorID()
 # don't use hits from straw veto
      station = int(detID/10000000)
@@ -788,7 +794,6 @@ class ShipDigiReco:
 
      h['vshape'].Fill(p.dist2Wire(), driftTime)
      h['recoDist'].Fill(smear, p.dist2Wire())
-
 
      if abs(stop.y())==abs(start.y()): h['disty'].Fill(smear)
      if abs(stop.y())>abs(start.y()): h['distu'].Fill(smear)
