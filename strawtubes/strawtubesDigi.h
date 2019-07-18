@@ -24,7 +24,7 @@ class strawtubesDigi {
 
     Double_t DriftTimeFromDist2Wire(Double_t dist2Wire);
     Double_t NewDist2WireFromDriftTime(Double_t driftTime);
-    Double_t DriftTimeFromTDC(Double_t TDC, Double_t t0, Double_t strawTime, Double_t electronicsTime);
+    Double_t DriftTimeFromTDC(Double_t TDC, Double_t t0, Double_t signalPropagationTime);
 
     // to set the parameter of misalignment, different input refer to different case (uniform sagging or not)
     void InitializeMisalign(Double_t tubeSag, Double_t wireSag, Double_t r, bool inDebug); 

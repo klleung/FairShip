@@ -52,13 +52,13 @@ Double_t strawtubesDigi::DriftTimeFromDist2Wire(Double_t dist2Wire) {
 }
 
 Double_t strawtubesDigi::NewDist2WireFromDriftTime(Double_t driftTime) {
-    NewDist2WireCalculation(driftTime);
-//    default_NewDist2WireCalculation(driftTime);
+//    NewDist2WireCalculation(driftTime);
+    default_NewDist2WireCalculation(driftTime);
     return newDist2Wire;
 }
 
-Double_t strawtubesDigi::DriftTimeFromTDC(Double_t TDC, Double_t t0, Double_t strawTime, Double_t electronicsTime) {
-  return TDC - t0 - strawTime - electronicsTime;
+Double_t strawtubesDigi::DriftTimeFromTDC(Double_t TDC, Double_t t0, Double_t signalPropagationTime) {
+  return TDC - t0 - signalPropagationTime;
 
 }
 
