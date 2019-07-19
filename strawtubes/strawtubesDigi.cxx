@@ -27,7 +27,11 @@ void strawtubesDigi::driftTimeCalculation(Double_t dist2Wire) {
 }
 
 void strawtubesDigi::NewDist2WireCalculation(Double_t driftTime) {
-    newDist2Wire = timeDependence->GetX(driftTime, 0., 1.);
+    if (beingInit)
+    {
+       newDist2Wire = timeDependence->GetX(driftTime, 0., 2.*tubeRadius);
+    }
+    else newDist2Wire = timeDependence->GetX(driftTime, 0., 1.);
 }
 
 void strawtubesDigi::default_NewDist2WireCalculation(Double_t driftTime) {
