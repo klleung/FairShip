@@ -160,7 +160,7 @@ bool strawtubesDigi::CheckInTube(TVector3 pPos, TVector3 start, TVector3 stop, F
     if ((h - (pPos.y()-wPos.y())) < tubeShift)
     {
 //       if (debug){ std::cout<<"OutOfTube"<<std::endl; }
-       return false;
+      return false;
     }
     return true;
 }

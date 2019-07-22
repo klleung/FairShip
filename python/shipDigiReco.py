@@ -785,15 +785,16 @@ class ShipDigiReco:
      driftTime = ROOT.strawtubesDigi.Instance().DriftTimeFromTDC(TDC, t0, signalPropagationTime)
      smear = ROOT.strawtubesDigi.Instance().NewDist2WireFromDriftTime(driftTime)
 
-     if smear > ShipGeo.strawtubes.InnerStrawDiameter/2.: aDigi.setInvalid()
+     if smear > ShipGeo.strawtubes.InnerStrawDiameter: aDigi.setInvalid()
 
      if no_amb: smear = p.dist2Wire()
 
      SmearedHits.append( {'digiHit':key,'xtop':stop.x(),'ytop':stop.y(),'z':stop.z(),'xbot':start.x(),'ybot':start.y(),'dist':smear, 'detID':detID} )
      # Note: top.z()==bot.z() unless misaligned, so only add key 'z' to smearedHit
 
-     h['vshape'].Fill(smear, driftTime)
-     h['recoDist'].Fill(smear, p.dist2Wire())
+     if not aDigi.isValid():
+       h['vshape'].Fill(smear, driftTime)
+       h['recoDist'].Fill(smear, p.dist2Wire())
 
      if abs(stop.y())==abs(start.y()): h['disty'].Fill(smear)
      if abs(stop.y())>abs(start.y()): h['distu'].Fill(smear)
