@@ -122,6 +122,7 @@ if withHists:
  ut.bookHist(h,'nmeas','nr measuerements',100,0.,50.)
  ut.bookHist(h,'chi2','Chi2/DOF',100,0.,20.)
  ut.bookHist(h,'vshape','Drift Time vs distance to wire; Distance, cm; Time, ns',1000,0.,0.,10000,0.,0.)
+ ut.bookHist(h,'vshape_original','Drift Time vs distance to wire; Distance, cm; Time, ns',1000,0.,0.,10000,0.,0.)
  ut.bookHist(h,'recoDist','Reco dist vs distance to wire; Reco Distance, cm; Distance to the wire, cm',250,0.,2.5,100,0.,1.)
 
 import shipDet_conf
