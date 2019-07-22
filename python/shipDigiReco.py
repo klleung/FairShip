@@ -782,9 +782,10 @@ class ShipDigiReco:
      TDC = aHit.GetTDC()
      t0 = self.sTree.t0 + p.GetTime()
      signalPropagationTime = (stop[0]-p.GetX()) / u.speedOfLight
+     wireOffset = ROOT.strawtubesDigi.Instance().GetMaxWireSagging(detID)
      driftTime = ROOT.strawtubesDigi.Instance().DriftTimeFromTDC(TDC, t0, signalPropagationTime)
      if driftTime < 5.285: continue
-     smear = ROOT.strawtubesDigi.Instance().NewDist2WireFromDriftTime(driftTime)
+     smear = ROOT.strawtubesDigi.Instance().NewDist2WireFromDriftTime(driftTime, wireOffset)
 
      if smear > ShipGeo.strawtubes.InnerStrawDiameter: aDigi.setInvalid()
 

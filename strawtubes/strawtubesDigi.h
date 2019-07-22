@@ -23,7 +23,7 @@ class strawtubesDigi {
     void SetLandauParams(Double_t p1, Double_t p2, Double_t p3, Double_t p4, Double_t p5);
 
     Double_t DriftTimeFromDist2Wire(Double_t dist2Wire);
-    Double_t NewDist2WireFromDriftTime(Double_t driftTime);
+    Double_t NewDist2WireFromDriftTime(Double_t driftTime, Double_t wireOffset);
     Double_t DriftTimeFromTDC(Double_t TDC, Double_t t0, Double_t signalPropagationTime);
 
     // to set the parameter of misalignment, different input refer to different case (uniform sagging or not)
@@ -35,7 +35,6 @@ class strawtubesDigi {
 
   private:
     strawtubesDigi();
-    strawtubesDigi(TF1 *timeCoordinate_dependence);
     virtual ~strawtubesDigi();
     strawtubesDigi(const strawtubesDigi&);
     strawtubesDigi& operator = (const strawtubesDigi&);
@@ -43,6 +42,8 @@ class strawtubesDigi {
     Double_t mpvTime;                   //! MPV for the Landau distribution
     Double_t LandauSigma;               //! sigma for the Landau distribution
     TF1 *timeDependence;                //! time-coordinate dependence
+    TF1 *leftChain;
+    TF1 *rightChain;
     Double_t driftTime;
     Double_t p1 = 8.52;                 //! Parametrization parameters
     Double_t p2 = 4.66;
@@ -55,8 +56,9 @@ class strawtubesDigi {
 
     void driftTimeCalculation(Double_t dist2Wire);        //! Calculates the drift time from input distance to the wire
 
-    void NewDist2WireCalculation(Double_t driftTime);         //! Calculates distance to the wire after drift time smearing for the user time-coordinate dependence function
+    void NewDist2WireCalculation(Double_t driftTime, Double_t wireOffset);         //! Calculates distance to the wire after drift time smearing for the user time-coordinate dependence function
     void default_NewDist2WireCalculation(Double_t driftTime); //! Calculates distance to the wire after drift time smearing for the default time-coordinate dependence function
+    void parabolaChainsEstimation(Double_t wireOffset);
 
     // Misalignment part
     Double_t tubeRadius;

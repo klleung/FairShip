@@ -5,16 +5,14 @@ strawtubesDigi::strawtubesDigi() {
     LandauSigma = 0;
     newDist2Wire = 0;
     f2 = 0;
-    timeDependence = new TF1("timeCoordinate_dependence", "[0]*x*x + [1]", 0., 1.);
+    timeDependence = new TF1("timeCoordinate_dependence", "[0]*x*x + [1]");
     timeDependence->SetParameter(0, 622.8);
     timeDependence->SetParameter(1, 5.285);
+    leftChain = new TF1("leftChain", "[0]*x*x + [1]");
+    leftChain->SetParameter(1, 5.285);
+    rightChain = new TF1("rightChain", "[0]*x*x + [1]");
+    rightChain->SetParameter(1, 5.285);
     rand = new TRandom3();
-}
-
-strawtubesDigi::strawtubesDigi(TF1 *timeCoordinate_dependence) {
-    mpvTime = 0;
-    LandauSigma = 0;
-    timeDependence = timeCoordinate_dependence;
 }
 
 strawtubesDigi::~strawtubesDigi() { }
@@ -26,8 +24,14 @@ void strawtubesDigi::driftTimeCalculation(Double_t dist2Wire) {
     driftTime = rand->Landau(mpvTime, LandauSigma);
 }
 
-void strawtubesDigi::NewDist2WireCalculation(Double_t driftTime) {
-    newDist2Wire = timeDependence->GetX(driftTime, 0., 1.);
+void strawtubesDigi::NewDist2WireCalculation(Double_t driftTime, Double_t wireOffset) {
+    parabolaChainsEstimation(wireOffset)
+    Double_t checkTime = rightChain->Eval(1.);
+    if (driftTime < checkTime) {
+       newDist2Wire = rightChain->GetX(driftTime. 0., 4.)
+    } else {
+       newDist2Wire = leftChain->GetX(driftTime, 0., 4.);
+    }
 }
 
 void strawtubesDigi::default_NewDist2WireCalculation(Double_t driftTime) {
@@ -51,15 +55,22 @@ Double_t strawtubesDigi::DriftTimeFromDist2Wire(Double_t dist2Wire) {
     return driftTime;
 }
 
-Double_t strawtubesDigi::NewDist2WireFromDriftTime(Double_t driftTime) {
-//    NewDist2WireCalculation(driftTime);
-    default_NewDist2WireCalculation(driftTime);
+Double_t strawtubesDigi::NewDist2WireFromDriftTime(Double_t driftTime, Double_t wireOffset) {
+    NewDist2WireCalculation(driftTime, wireOffset);
+//    default_NewDist2WireCalculation(driftTime);
     return newDist2Wire;
 }
 
 Double_t strawtubesDigi::DriftTimeFromTDC(Double_t TDC, Double_t t0, Double_t signalPropagationTime) {
   return TDC - t0 - signalPropagationTime;
 
+}
+
+void strawtubesDigi::parabolaChainsEstimation(Double_t wireOffset) {
+   Double_t aLeftChain = 73.15 * wireOffset + 622.8;
+   Double_t aRightChain = -84.55 * wireOffset + 622.8;
+   leftChain->SetParameter(0, aLeftChain);
+   rightChain->SetParameter(0, aRightChain);
 }
 
 // For the Misalignment part
