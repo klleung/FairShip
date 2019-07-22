@@ -26,7 +26,7 @@ void strawtubesDigi::driftTimeCalculation(Double_t dist2Wire) {
 
 void strawtubesDigi::NewDist2WireCalculation(Double_t driftTime, Double_t wireOffset) {
     parabolaChainsEstimation(wireOffset)
-    Double_t checkTime = rightChain->Eval(1.);
+    Double_t checkTime = rightChain->Eval(1.0 - wireOffset);
     if (driftTime < checkTime) {
        newDist2Wire = rightChain->GetX(driftTime. 0., 4.)
     } else {

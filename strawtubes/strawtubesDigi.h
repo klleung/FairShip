@@ -76,7 +76,7 @@ class strawtubesDigi {
     Double_t FindTubeShift(Double_t x, Double_t startx, Double_t stopx, Float_t ID);
     Double_t FindWireShift(Double_t x, Double_t startx, Double_t stopx, Float_t ID);
     Double_t GetMaxTubeSagging(Float_t ID);
-    Double_t GetMaxWireSagging(Float_t ID);
+    Double_t GetMaxWireSagging(Float_t ID); // need to get wire offset in Tube
 };
 
 
