@@ -17,8 +17,12 @@ strawtubesDigi::strawtubesDigi() {
 
 strawtubesDigi::~strawtubesDigi() { }
 
-void strawtubesDigi::driftTimeCalculation(Double_t dist2Wire) {
-    mpvTime = timeDependence->Eval(dist2Wire);
+void strawtubesDigi::driftTimeCalculation(Double_t dist2Wire, bool inSmallerArea) {
+    if (inSmallerArea) {
+       mpvTime = rightChain->Eval(dist2Wire);
+    } else {
+       mpvTime = leftChain->Eval(dist2Wire);
+    }
     f2 = p1 * TMath::Exp(-p2 * dist2Wire) + p3 * TMath::Exp(-p4 * dist2Wire) + p5;
     LandauSigma = mpvTime * f2 / 100;
     driftTime = rand->Landau(mpvTime, LandauSigma);
@@ -50,8 +54,8 @@ void strawtubesDigi::SetLandauParams(Double_t p1, Double_t p2, Double_t p3, Doub
     this->p5 = p5;
 }
 
-Double_t strawtubesDigi::DriftTimeFromDist2Wire(Double_t dist2Wire) {
-    driftTimeCalculation(dist2Wire);
+Double_t strawtubesDigi::DriftTimeFromDist2Wire(Double_t dist2Wire, bool inSmallerArea) {
+    driftTimeCalculation(dist2Wire, inSmallerArea);
     return driftTime;
 }
 
@@ -185,5 +189,9 @@ Double_t strawtubesDigi::FindMisalignDist2Wire(TVector3 pPos, TVector3 start, TV
     return dr.Mag();
 
     // Another method, by using TF1 to find inverse function and minimize
+}
+
+Double_t strawtubesDigi::GetWireOffset(Float_t ID) {
+   return GetMaxTubeSagging(ID) - GetMaxWireSagging(ID);
 }
 

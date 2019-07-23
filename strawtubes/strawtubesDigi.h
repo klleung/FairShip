@@ -22,7 +22,7 @@ class strawtubesDigi {
  */
     void SetLandauParams(Double_t p1, Double_t p2, Double_t p3, Double_t p4, Double_t p5);
 
-    Double_t DriftTimeFromDist2Wire(Double_t dist2Wire);
+    Double_t DriftTimeFromDist2Wire(Double_t dist2Wire, bool inSmallerArea);
     Double_t NewDist2WireFromDriftTime(Double_t driftTime, Double_t wireOffset);
     Double_t DriftTimeFromTDC(Double_t TDC, Double_t t0, Double_t signalPropagationTime);
 
@@ -31,9 +31,8 @@ class strawtubesDigi {
     void InitializeMisalign(Double_t tubeMean, Double_t tubeSigma, Double_t wireSigma, Double_t wireMean, Double_t r, bool inDebug); 
     bool CheckInTube(TVector3 pPos, TVector3 start, TVector3 stop, Float_t ID);
     Double_t FindMisalignDist2Wire(TVector3 pPos, TVector3 start, TVector3 stop, Float_t ID);
-    Double_t GetMaxTubeSagging(Float_t ID);
-    Double_t GetMaxWireSagging(Float_t ID); // need to get wire offset in Tube
     bool IsMisalign() {return misalign;}
+    Double_t GetWireOffset(Float_t ID);
 
   private:
     strawtubesDigi();
@@ -56,7 +55,7 @@ class strawtubesDigi {
     Double_t f2;
     TRandom3 *rand;
 
-    void driftTimeCalculation(Double_t dist2Wire);        //! Calculates the drift time from input distance to the wire
+    void driftTimeCalculation(Double_t dist2Wire, bool inSmallerArea);        //! Calculates the drift time from input distance to the wire
 
     void NewDist2WireCalculation(Double_t driftTime, Double_t wireOffset);         //! Calculates distance to the wire after drift time smearing for the user time-coordinate dependence function
     void default_NewDist2WireCalculation(Double_t driftTime); //! Calculates distance to the wire after drift time smearing for the default time-coordinate dependence function
@@ -77,6 +76,8 @@ class strawtubesDigi {
 
     Double_t FindTubeShift(Double_t x, Double_t startx, Double_t stopx, Float_t ID);
     Double_t FindWireShift(Double_t x, Double_t startx, Double_t stopx, Float_t ID);
+    Double_t GetMaxTubeSagging(Float_t ID);
+    Double_t GetMaxWireSagging(Float_t ID);
 
 };
 
