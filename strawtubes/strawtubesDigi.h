@@ -31,7 +31,9 @@ class strawtubesDigi {
     void InitializeMisalign(Double_t tubeMean, Double_t tubeSigma, Double_t wireSigma, Double_t wireMean, Double_t r, bool inDebug); 
     bool CheckInTube(TVector3 pPos, TVector3 start, TVector3 stop, Float_t ID);
     Double_t FindMisalignDist2Wire(TVector3 pPos, TVector3 start, TVector3 stop, Float_t ID);
+    bool InSmallerSection(TVector3 pPos, TVector3 start, TVector3 stop, Float_t ID);
     bool IsMisalign() {return misalign;}
+
     Double_t GetWireOffset(Float_t ID);
 
   private:

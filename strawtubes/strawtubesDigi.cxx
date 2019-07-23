@@ -191,6 +191,23 @@ Double_t strawtubesDigi::FindMisalignDist2Wire(TVector3 pPos, TVector3 start, TV
     // Another method, by using TF1 to find inverse function and minimize
 }
 
+bool strawtubesDigi::InSmallerSection(TVector3 pPos, TVector3 start, TVector3 stop, Float_t ID)
+{
+    TVector3 wPos = ((start.x() - pPos.x()) * stop + (pPos.x() - stop.x()) * start) * (1./(start.x() - stop.x()));
+    Double_t wireShift = FindWireShift(pPos.x(), start.x(), stop.x(), ID);
+    Double_t tubeShift = FindWireShift(pPos.x(), start.x(), stop.x(), ID);
+    if (wireShift <= tubeShift)  // the wire is above the tube center, upper part is smaller part
+    {
+        if (pPos.y() > wPos.y() - wireShift) { return true;}
+        else return false;
+    }
+    else			 // the wire is under the tube center, lower part is smaller part
+    {
+        if (pPos.y() > wPos.y() - wireShift) { return false;}
+        else return true;
+    }
+}
+
 Double_t strawtubesDigi::GetWireOffset(Float_t ID) {
    return GetMaxTubeSagging(ID) - GetMaxWireSagging(ID);
 }
