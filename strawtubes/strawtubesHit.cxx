@@ -43,9 +43,10 @@ strawtubesHit::strawtubesHit(strawtubesPoint* p, Double_t t0)
      // recaluclate dist2wire with misalign 
      flag = false;
      Double_t dist2Wire;
+     TVector3 pPos;
      if (strawtubesDigi::Instance().IsMisalign())
      {
-        TVector3 pPos = TVector3(p->GetX(), p->GetY(), p->GetZ());
+        pPos = TVector3(p->GetX(), p->GetY(), p->GetZ());
         flag = strawtubesDigi::Instance().CheckInTube(pPos,start,stop,fDetectorID);
         if (flag)
         {
@@ -60,7 +61,8 @@ strawtubesHit::strawtubesHit(strawtubesPoint* p, Double_t t0)
 
      if (flag)
      {
-        driftTime = strawtubesDigi::Instance().DriftTimeFromDist2Wire(dist2Wire, true);
+        bool inSmallArea = strawtubesDigi::Instance().InSmallerSection(pPos, start, stop, fDetectorID);
+        driftTime = strawtubesDigi::Instance().DriftTimeFromDist2Wire(dist2Wire, inSmallArea);
         fdigi = t0 + p->GetTime() + driftTime + (stop[0] - p->GetX()) / speedOfLight;
      }
      else fdigi = -1;
