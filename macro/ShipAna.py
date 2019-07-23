@@ -619,6 +619,7 @@ def myEventLoop(n):
      
 # make some straw hit analysis
   hitlist = {}
+# must be change to strawtubesHit!
   for ahit in sTree.strawtubesPoint:
      detID = ahit.GetDetectorID()
      top = ROOT.TVector3()

@@ -778,19 +778,26 @@ class ShipDigiReco:
 
      # use true t0  construction: 
      #     fdigi = t0 + p->GetTime() + t_drift + ( stop[0]-p->GetX() )/ speedOfLight;
-     TDC = aDigi.GetDigi()
-     t0 = self.sTree.t0
-     strawTime = p.GetTime()
-     electronicsTime = (stop[0]-p.GetX()) / u.speedOfLight
-     driftTime = ROOT.strawtubesDigi.Instance().DriftTimeFromTDC(TDC, t0, strawTime, electronicsTime)
-     smear = ROOT.strawtubesDigi.Instance().NewDist2WireFromDriftTime(driftTime)
+     aHit = ROOT.strawtubesHit(p,self.sTree.t0)
+     TDC = aHit.GetTDC()
+     t0 = self.sTree.t0 + p.GetTime()
+     signalPropagationTime = (stop[0]-p.GetX()) / u.speedOfLight
+     wireOffset = ROOT.strawtubesDigi.Instance().GetWireOffset(detID)
+     driftTime = ROOT.strawtubesDigi.Instance().DriftTimeFromTDC(TDC, t0, signalPropagationTime)
+     if driftTime < 5.285: continue
+     smear = ROOT.strawtubesDigi.Instance().NewDist2WireFromDriftTime(driftTime, wireOffset)
+
+     if smear > ShipGeo.strawtubes.InnerStrawDiameter: aDigi.setInvalid()
+
      if no_amb: smear = p.dist2Wire()
 
      SmearedHits.append( {'digiHit':key,'xtop':stop.x(),'ytop':stop.y(),'z':stop.z(),'xbot':start.x(),'ybot':start.y(),'dist':smear, 'detID':detID} )
      # Note: top.z()==bot.z() unless misaligned, so only add key 'z' to smearedHit
 
-     h['vshape'].Fill(p.dist2Wire(), driftTime)
-     h['recoDist'].Fill(smear, p.dist2Wire())
+     if aDigi.isValid():
+         h['vshape'].Fill(smear, driftTime)
+         h['vshape_original'].Fill(p.dist2Wire(), driftTime)
+         h['recoDist'].Fill(smear, p.dist2Wire())
 
      if abs(stop.y())==abs(start.y()): h['disty'].Fill(smear)
      if abs(stop.y())>abs(start.y()): h['distu'].Fill(smear)
