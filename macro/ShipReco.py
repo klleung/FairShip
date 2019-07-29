@@ -171,12 +171,12 @@ for iEvent in range(firstEvent, nEvents):
  # memory monitoring
  # mem_monitor() 
 # end loop over events
-ut.bookCanvas(h,key='dist',title='dist',nx=1200,ny=600,cx=3,cy=1)
+'''ut.bookCanvas(h,key='dist',title='dist',nx=1200,ny=600,cx=3,cy=1)
 cv=h['dist'].cd(1)
 h['disty'].Draw()
 cv=h['dist'].cd(2)
 h['distu'].Draw()
 cv=h['dist'].cd(3)
 h['distv'].Draw()
-h['dist'].Print('dist2Wire.gif')
+h['dist'].Print('dist2Wire.gif')'''
 SHiP.finish()

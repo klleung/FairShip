@@ -8,6 +8,9 @@
 #include "TVector3.h"
 #include <map>
 
+enum RANDTYPE{None, Gaus, Unif};
+typedef enum RANDTYPE RandType;
+
 class strawtubesDigi {
   public:
     static strawtubesDigi& Instance() {
@@ -26,13 +29,25 @@ class strawtubesDigi {
     Double_t NewDist2WireFromDriftTime(Double_t driftTime, Double_t wireOffset);
     Double_t DriftTimeFromTDC(Double_t TDC, Double_t t0, Double_t signalPropagationTime);
 
-    // to set the parameter of misalignment, different input refer to different case (uniform sagging or not)
-    void InitializeMisalign(Double_t tubeSag, Double_t wireSag, Double_t r, bool inDebug); 
-    void InitializeMisalign(Double_t tubeMean, Double_t tubeSigma, Double_t wireSigma, Double_t wireMean, Double_t r, bool inDebug); 
+    // For turnOn/Off the Drift Time Calculation part
+    void UseDefaultDriftTime(bool inDefaultDriftTime) { defaultDriftTime = inDefaultDriftTime;}
+    bool IsDefaultDriftTime() { return defaultDriftTime;}
+
+    // to set the parameter of misalignment
+    void PassRadius(Double_t r) {tubeRadius = r;};
+    void SetDebug(bool debugFlag) {debug = debugFlag;};
+    void SetSameSagging(Double_t inMaxTubeSagging, Double_t inMaxWireSagging);
+    void SetGausSagging(Double_t inMaxTubeSagging, Double_t inTubeGausSigma, Double_t inMaxWireSagging, Double_t inWireGausSigma);
+    void SetUnifSagging(Double_t inMaxTubeSagging, Double_t inTubeUnifDelta, Double_t inMaxWireSagging, Double_t inWireUnifDelta);
     bool CheckInTube(TVector3 pPos, TVector3 start, TVector3 stop, Float_t ID);
     Double_t FindMisalignDist2Wire(TVector3 pPos, TVector3 start, TVector3 stop, Float_t ID);
     bool InSmallerSection(TVector3 pPos, TVector3 start, TVector3 stop, Float_t ID);
-    bool IsMisalign() {return misalign;}
+    bool IsMisalign() { return misalign;}
+    bool IsInitialized() { return beingInit;}
+
+    // old version
+    void InitializeMisalign(Double_t tubeSag, Double_t wireSag, Double_t r, bool inDebug); 
+    void InitializeMisalign(Double_t tubeMean, Double_t tubeSigma, Double_t wireSigma, Double_t wireMean, Double_t r, bool inDebug); 
 
     Double_t GetWireOffset(Float_t ID);
 
@@ -57,6 +72,8 @@ class strawtubesDigi {
     Double_t f2;
     TRandom3 *rand;
 
+    bool defaultDriftTime = false;
+
     void driftTimeCalculation(Double_t dist2Wire, bool inSmallerArea);        //! Calculates the drift time from input distance to the wire
 
     void NewDist2WireCalculation(Double_t driftTime, Double_t wireOffset);         //! Calculates distance to the wire after drift time smearing for the user time-coordinate dependence function
@@ -64,15 +81,17 @@ class strawtubesDigi {
     void parabolaChainsEstimation(Double_t wireOffset);
 
     // Misalignment part
-    Double_t tubeRadius;
-    Double_t maxTubeSagging;
-    Double_t maxWireSagging;
-    Double_t tubeGausSigma;
-    Double_t wireGausSigma;
+    Double_t tubeRadius = 1.0;
+    Double_t maxTubeSagging = 0.0;
+    Double_t maxWireSagging = 0.0;
+    Double_t tubeGausSigma = 0.0;
+    Double_t wireGausSigma = 0.0;
+    Double_t tubeUnifDelta = 0.0;
+    Double_t wireUnifDelta = 0.0;
     std::map<Float_t, Double_t> tubeSaggingMap;
     std::map<Float_t, Double_t> wireSaggingMap;
     bool misalign = false;
-    bool uniformSagging = true;
+    RandType randType = None;
     bool debug = false;
     bool beingInit = false;
 

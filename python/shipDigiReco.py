@@ -708,13 +708,27 @@ class ShipDigiReco:
        self.digiSBT2MC.push_back(v)
        index=index+1
  def digitizeStrawTubes(self):
- # digitize FairSHiP MC hits  
+ # digitize FairSHiP MC hits 
+   # from strawDigi_conf to initialize the part of module of misalignment 
    from strawDigi_conf import StrawtubesMisalign as stm
-   if stm.misalign:
-     if stm.sameSagging:
-       ROOT.strawtubesDigi.Instance().InitializeMisalign(stm.maxTubeSagging,stm.maxWireSagging,ShipGeo.strawtubes.InnerStrawDiameter/2.,stm.debug);
+   from strawDigi_conf import DriftTimeCalculate as dtc
+
+   # turn on Drift time part or not, or using default setting
+   ROOT.strawtubesDigi.Instance().UseDefaultDriftTime(dtc.defaultDriftTime)
+
+   # misalign part
+   beingInit = ROOT.strawtubesDigi.Instance().IsInitialized()
+   if (stm.misalign and (not beingInit)):
+     ROOT.strawtubesDigi.Instance().PassRadius(ShipGeo.strawtubes.InnerStrawDiameter/2.)
+     ROOT.strawtubesDigi.Instance().SetDebug(stm.debug)
+     if stm.randType == "None":
+       ROOT.strawtubesDigi.Instance().SetSameSagging(stm.maxTubeSagging, stm.maxWireSagging)
+     elif stm.randType == "Gaus":
+       ROOT.strawtubesDigi.Instance().SetGausSagging(stm.maxTubeSagging, stm.tubeGausSigma, stm.maxWireSagging, stm.wireGausSigma)
+     elif stm.randType == "Unif":
+       ROOT.strawtubesDigi.Instance().SetUnifSagging(stm.maxTubeSagging, stm.tubeUnifDelta, stm.maxWireSagging, stm.wireUnifDelta)
      else:
-       ROOT.strawtubesDigi.Instance().InitializeMisalign(stm.maxTubeSagging,stm.tubeGausSigma,stm.maxWireSagging,stm.wireGausSigma,ShipGeo.strawtubes.InnerStrawDiameter/2.,stm.debug);
+       print "Not a proper type of distribution for strawtube sagging"
    index = 0
    hitsPerDetId = {}
    for aMCPoint in self.sTree.strawtubesPoint:
@@ -778,27 +792,29 @@ class ShipDigiReco:
 
      # use true t0  construction: 
      #     fdigi = t0 + p->GetTime() + t_drift + ( stop[0]-p->GetX() )/ speedOfLight;
-     aHit = ROOT.strawtubesHit(p,self.sTree.t0)
-     TDC = aHit.GetTDC()
-     t0 = self.sTree.t0 + p.GetTime()
-     signalPropagationTime = (stop[0]-p.GetX()) / u.speedOfLight
-     wireOffset = ROOT.strawtubesDigi.Instance().GetWireOffset(detID)
-     driftTime = ROOT.strawtubesDigi.Instance().DriftTimeFromTDC(TDC, t0, signalPropagationTime)
-     if driftTime < 5.285: continue
-     smear = ROOT.strawtubesDigi.Instance().NewDist2WireFromDriftTime(driftTime, wireOffset)
+     if (ROOT.strawtubesDigi.Instance().IsDefaultDriftTime()):
+         smear = (aDigi.GetDigi() - self.sTree.t0  - p.GetTime() - ( stop[0]-p.GetX() )/ u.speedOfLight) * v_drift
+     else:
+         aHit = ROOT.strawtubesHit(p,self.sTree.t0)
+         TDC = aHit.GetTDC()
+         t0 = self.sTree.t0 + p.GetTime()
+         signalPropagationTime = (stop[0]-p.GetX()) / u.speedOfLight
+         wireOffset = ROOT.strawtubesDigi.Instance().GetWireOffset(detID)
+         driftTime = ROOT.strawtubesDigi.Instance().DriftTimeFromTDC(TDC, t0, signalPropagationTime)
+         if driftTime < 5.285: continue
+         smear = ROOT.strawtubesDigi.Instance().NewDist2WireFromDriftTime(driftTime, wireOffset)
 
-     if smear > ShipGeo.strawtubes.InnerStrawDiameter: aDigi.setInvalid()
+         if smear > ShipGeo.strawtubes.InnerStrawDiameter: aDigi.setInvalid()
+
+         if aDigi.isValid():
+             h['vshape'].Fill(smear, driftTime)
+             h['vshape_original'].Fill(p.dist2Wire(), driftTime)
+             h['recoDist'].Fill(smear, p.dist2Wire())
 
      if no_amb: smear = p.dist2Wire()
 
      SmearedHits.append( {'digiHit':key,'xtop':stop.x(),'ytop':stop.y(),'z':stop.z(),'xbot':start.x(),'ybot':start.y(),'dist':smear, 'detID':detID} )
      # Note: top.z()==bot.z() unless misaligned, so only add key 'z' to smearedHit
-
-     if aDigi.isValid():
-         h['vshape'].Fill(smear, driftTime)
-         h['vshape_original'].Fill(p.dist2Wire(), driftTime)
-         h['recoDist'].Fill(smear, p.dist2Wire())
-
      if abs(stop.y())==abs(start.y()): h['disty'].Fill(smear)
      if abs(stop.y())>abs(start.y()): h['distu'].Fill(smear)
      if abs(stop.y())<abs(start.y()): h['distv'].Fill(smear)

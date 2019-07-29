@@ -78,6 +78,37 @@ void strawtubesDigi::parabolaChainsEstimation(Double_t wireOffset) {
 }
 
 // For the Misalignment part
+void strawtubesDigi::SetSameSagging(Double_t inMaxTubeSagging, Double_t inMaxWireSagging)
+{
+    maxTubeSagging = inMaxTubeSagging;
+    maxWireSagging = inMaxWireSagging;
+    randType = None;
+    misalign = true;
+    beingInit = true;
+}
+
+void strawtubesDigi::SetGausSagging(Double_t inMaxTubeSagging, Double_t inTubeGausSigma, Double_t inMaxWireSagging, Double_t inWireGausSigma)
+{
+    maxTubeSagging = inMaxTubeSagging;
+    maxWireSagging = inMaxWireSagging;
+    tubeGausSigma = inTubeGausSigma;
+    wireGausSigma = inWireGausSigma;
+    randType = Gaus;
+    misalign = true;
+    beingInit = true;
+}
+
+void strawtubesDigi::SetUnifSagging(Double_t inMaxTubeSagging, Double_t inTubeUnifDelta, Double_t inMaxWireSagging, Double_t inWireUnifDelta)
+{
+    maxTubeSagging = inMaxTubeSagging;
+    maxWireSagging = inMaxWireSagging;
+    tubeUnifDelta = inTubeUnifDelta;
+    wireUnifDelta = inWireUnifDelta;
+    randType = Unif;
+    misalign = true;
+    beingInit = true;
+}
+
 void strawtubesDigi::InitializeMisalign(Double_t tubeSag, Double_t wireSag, Double_t r, bool inDebug) 
 {
     if (not(beingInit))
@@ -86,7 +117,7 @@ void strawtubesDigi::InitializeMisalign(Double_t tubeSag, Double_t wireSag, Doub
        maxWireSagging = wireSag;
        tubeRadius = r;
        debug = inDebug;
-       uniformSagging = true;
+       randType = None;
        misalign = true;
        beingInit = true;
     }
@@ -102,7 +133,7 @@ void strawtubesDigi::InitializeMisalign(Double_t tubeMean, Double_t tubeSigma, D
        wireGausSigma = wireSigma;
        tubeRadius = r;
        debug = inDebug;
-       uniformSagging = false;
+       randType = Gaus;
        misalign = true;
        beingInit = true;
     }
@@ -110,7 +141,7 @@ void strawtubesDigi::InitializeMisalign(Double_t tubeMean, Double_t tubeSigma, D
 
 Double_t strawtubesDigi::GetMaxTubeSagging(Float_t ID)
 {
-    if (uniformSagging)
+    if (randType == None)
     {
        return maxTubeSagging;
     }
@@ -118,7 +149,14 @@ Double_t strawtubesDigi::GetMaxTubeSagging(Float_t ID)
     {
        if (tubeSaggingMap.count(ID) == 0)
        {
-          tubeSaggingMap[ID] = gRandom->Gaus(maxTubeSagging, tubeGausSigma);
+          if (randType == Gaus)
+          {
+              tubeSaggingMap[ID] = rand->Gaus(maxTubeSagging, tubeGausSigma);
+          }
+          else if (randType == Unif)
+          {
+              tubeSaggingMap[ID] = rand->Uniform(maxTubeSagging - tubeUnifDelta, maxTubeSagging + tubeUnifDelta);
+          }
           if (tubeSaggingMap[ID] < 0){ tubeSaggingMap[ID] = 0;}
        }
        return tubeSaggingMap[ID];
@@ -127,7 +165,7 @@ Double_t strawtubesDigi::GetMaxTubeSagging(Float_t ID)
 
 Double_t strawtubesDigi::GetMaxWireSagging(Float_t ID)
 {
-    if (uniformSagging)
+    if (randType == None)
     {
        return maxWireSagging;
     }
@@ -135,7 +173,14 @@ Double_t strawtubesDigi::GetMaxWireSagging(Float_t ID)
     {
        if (wireSaggingMap.count(ID) == 0)
        {
-          wireSaggingMap[ID] = gRandom->Gaus(maxWireSagging, wireGausSigma);
+          if (randType == Gaus)
+          {
+              wireSaggingMap[ID] = rand->Gaus(maxWireSagging, wireGausSigma);
+          }
+          else if (randType == Unif)
+          {
+              wireSaggingMap[ID] = rand->Uniform(maxWireSagging - wireUnifDelta, maxWireSagging + wireUnifDelta);
+          }
           if (wireSaggingMap[ID] < 0){ wireSaggingMap[ID] = 0;}
        }
        return wireSaggingMap[ID];
