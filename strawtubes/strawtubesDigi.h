@@ -7,6 +7,8 @@
 #include "TMath.h"
 #include "TVector3.h"
 #include <map>
+#include "strawtubesPoint.h"
+#include "strawtubes.h"
 
 enum RANDTYPE{None, Gaus, Unif};
 typedef enum RANDTYPE RandType;
@@ -41,6 +43,7 @@ class strawtubesDigi {
     void SetUnifSagging(Double_t inMaxTubeSagging, Double_t inTubeUnifDelta, Double_t inMaxWireSagging, Double_t inWireUnifDelta);
     bool CheckInTube(TVector3 pPos, TVector3 start, TVector3 stop, Float_t ID);
     Double_t FindMisalignDist2Wire(TVector3 pPos, TVector3 start, TVector3 stop, Float_t ID);
+    Double_t FindMisalignDist2Wire(strawtubesPoint* p);
     bool InSmallerSection(TVector3 pPos, TVector3 start, TVector3 stop, Float_t ID);
     bool IsMisalign() { return misalign;}
     bool IsInitialized() { return beingInit;}
@@ -99,6 +102,7 @@ class strawtubesDigi {
     Double_t FindWireShift(Double_t x, Double_t startx, Double_t stopx, Float_t ID);
     Double_t GetMaxTubeSagging(Float_t ID);
     Double_t GetMaxWireSagging(Float_t ID);
+    Double_t FindWireSlope(Double_t x, TVector3 start, TVector3 stop, Float_t ID);
 
 };
 

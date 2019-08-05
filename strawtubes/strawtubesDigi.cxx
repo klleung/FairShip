@@ -1,4 +1,5 @@
 #include "strawtubesDigi.h"
+#include "FairRunSim.h"
 
 strawtubesDigi::strawtubesDigi() {
     mpvTime = 0;
@@ -149,7 +150,7 @@ Double_t strawtubesDigi::GetMaxTubeSagging(Float_t ID)
     {
        if (tubeSaggingMap.count(ID) == 0)
        {
-          if (randType == Gaus)
+          if (randType == Gaus) //not yet finished, need a condition check to prevent non physics result
           {
               tubeSaggingMap[ID] = rand->Gaus(maxTubeSagging, tubeGausSigma);
           }
@@ -173,7 +174,7 @@ Double_t strawtubesDigi::GetMaxWireSagging(Float_t ID)
     {
        if (wireSaggingMap.count(ID) == 0)
        {
-          if (randType == Gaus)
+          if (randType == Gaus) // not yet finished
           {
               wireSaggingMap[ID] = rand->Gaus(maxWireSagging, wireGausSigma);
           }
@@ -225,13 +226,68 @@ bool strawtubesDigi::CheckInTube(TVector3 pPos, TVector3 start, TVector3 stop, F
     return true;
 }
 
+Double_t strawtubesDigi::FindWireSlope(Double_t x, TVector3 start, TVector3 stop, Float_t ID)
+{
+    Double_t startx = start.x();
+    Double_t stopx = stop.x();
+    Double_t delta = GetMaxWireSagging(ID);
+    Double_t a = -4. * delta / TMath::Sq(startx - stopx);
+    Double_t b = 0.5 * (startx + stopx);
+
+    Double_t slope = 2 * a * (x - b);
+    slope = slope + (start.y() - stop.y())/(startx - stopx);
+    return slope;
+}
+
 Double_t strawtubesDigi::FindMisalignDist2Wire(TVector3 pPos, TVector3 start, TVector3 stop, Float_t ID)
 {
+    // Approimate version, linearlized locally for the wire, 
+    TVector3 wPos = ((start.x() - pPos.x()) * stop + (pPos.x() - stop.x()) * start) * (1./(start.x() - stop.x()));
+    Double_t wireShift = FindWireShift(pPos.x(), start.x(), stop.x(), ID);
+    TVector3 dr = pPos - (wPos - TVector3(0,wireShift,0));
+    //return dr.Mag();
+
+    Double_t slope = FindWireSlope(pPos.x(), start, stop, ID);
+    Double_t theta = TMath::ATan(slope);
+    Double_t ds = TMath::Sqrt(dr.x()*dr.x() + dr.y() * dr.y()) * cos(theta);
+    Double_t dz = dr.z();
+    Double_t result = TMath::Sqrt(ds*ds+dz*dz);
+
+    TVector3 pFromEnd = pPos - start;
+    result = TMath::Min(result, pFromEnd.Mag());
+    pFromEnd = pPos - stop;
+    result = TMath::Min(result, pFromEnd.Mag());
+    return result;
+
+    // Another method, by using TF1 to find inverse function and minimize
+}
+
+Double_t strawtubesDigi::FindMisalignDist2Wire(strawtubesPoint* p)
+{
+    TVector3 pPos = TVector3(p->GetX(), p->GetY(), p->GetZ());
+    Float_t ID = p->GetDetectorID();
+    TVector3 start = TVector3();
+    TVector3 stop = TVector3();
+    strawtubes* module = dynamic_cast<strawtubes*> (FairRunSim::Instance()->GetListOfModules()->FindObject("Strawtubes") );
+    module->StrawEndPoints(ID,start,stop);
+    
     // Approimate version
     TVector3 wPos = ((start.x() - pPos.x()) * stop + (pPos.x() - stop.x()) * start) * (1./(start.x() - stop.x()));
     Double_t wireShift = FindWireShift(pPos.x(), start.x(), stop.x(), ID);
     TVector3 dr = pPos - (wPos - TVector3(0,wireShift,0));
-    return dr.Mag();
+    //return dr.Mag();
+
+    Double_t slope = FindWireSlope(pPos.x(), start, stop, ID);
+    Double_t theta = TMath::ATan(slope);
+    Double_t ds = TMath::Sqrt(dr.x()*dr.x() + dr.y() * dr.y()) * cos(theta);
+    Double_t dz = dr.z();
+    Double_t result = TMath::Sqrt(ds*ds+dz*dz);
+
+    TVector3 pFromEnd = pPos - start;
+    result = TMath::Min(result, pFromEnd.Mag());
+    pFromEnd = pPos - stop;
+    result = TMath::Min(result, pFromEnd.Mag());
+    return result;
 
     // Another method, by using TF1 to find inverse function and minimize
 }
