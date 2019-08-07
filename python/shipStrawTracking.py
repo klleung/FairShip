@@ -97,8 +97,8 @@ def run_track_pattern_recognition(input_file, geo_file, output_file, method):
       print "no fieldmap given, geofile too old, not anymore support"
       exit(-1)
     sGeo   = fgeo.FAIRGeom
-    geoMat =  ROOT.genfit.TGeoMaterialInterface()
-    ROOT.genfit.MaterialEffects.getInstance().init(geoMat)
+    #geoMat =  ROOT.genfit.TGeoMaterialInterface()
+    #ROOT.genfit.MaterialEffects.getInstance().init(geoMat)
     bfield = ROOT.genfit.FairShipFields()
     bfield.setField(fieldMaker.getGlobalField())
     fM = ROOT.genfit.FieldManager.getInstance()

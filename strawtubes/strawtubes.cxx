@@ -171,10 +171,14 @@ Bool_t  strawtubes::ProcessHits(FairVolume* vol)
     bot_prime = ((top.x()-Pos.X())*bot + (Pos.X()-bot.x())*top)*(1./(top.x()-bot.x()));
  
     // Coordinate shift
-    TVector3 fPos_prime = SaggingCoor(top,bot,fStrawSagging,fPos);
-    TVector3 Pos_prime = SaggingCoor(top,bot,fStrawSagging,Pos);
+    //TVector3 fPos_prime = SaggingCoor(top,bot,fStrawSagging,fPos);
+    //TVector3 Pos_prime = SaggingCoor(top,bot,fStrawSagging,Pos);
+    TVector3 fPos_prime = fPos;
+    TVector3 Pos_prime = Pos;
     top_prime = SaggingCoor(top,bot,fWireSagging,top_prime);
     bot_prime = SaggingCoor(top,bot,fWireSagging,bot_prime);
+
+
 
     // to find the dist2wire, it is a problem about distance between two straight line in 3D
     // from result of calculus and linear algebra
@@ -199,7 +203,7 @@ Bool_t  strawtubes::ProcessHits(FairVolume* vol)
 
     // need to handle if k not lie in [0,1], (?) will it really happen (?)
     // if out of range, consider the nearest end point
-    std::cout << "==========================================================" <<std::endl;
+/*    std::cout << "==========================================================" <<std::endl;
     if ((k < 0) or (k > 1))
     {
       std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
@@ -216,7 +220,7 @@ Bool_t  strawtubes::ProcessHits(FairVolume* vol)
       std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
       std::cout << h * (fPos_prime.x() - Pos_prime.x()) << std::endl;
     }
-
+*/
     TVector3 HitPos = fPos_prime + k*u;
     TVector3 r = k*u-h*v+w;
     Double_t dist2Wire = r.Mag();
@@ -227,7 +231,7 @@ Bool_t  strawtubes::ProcessHits(FairVolume* vol)
            fELoss,pdgCode,dist2Wire);
 
     // print out the values, for debug, for comparsion
-    TLorentzVector mean = 0.5*(fPos + Pos);
+/*    TLorentzVector mean = 0.5*(fPos + Pos);
     TVector3 pq = TVector3(top.x()-mean.X(), top.y()-mean.Y(), top.z()-mean.Z());
     u = bot - top;
     v = TVector3(fPos.X()-Pos.X(), fPos.Y()-Pos.Y(), fPos.Z()-Pos.Z());
@@ -247,7 +251,7 @@ Bool_t  strawtubes::ProcessHits(FairVolume* vol)
     std::cout << "dx        : " << fPos.X()-Pos.X() << std::endl;
     std::cout << "New hit   : " << HitPos.x() << "," << HitPos.y() << "," << HitPos.z() << std::endl;
     std::cout << "Old hit   : " << mean.X() << "," << mean.Y() << "," << mean.Z() << std::endl;
-
+*/
     // if the tube and the wire has different sagging, i.e. strawsagging != wiresagging
     // then the wire is not in the center, dist2Wire can be larger then the radius.
     /*
