@@ -158,75 +158,40 @@ Bool_t  strawtubes::ProcessHits(FairVolume* vol)
     StrawEndPoints(straw_uniqueId,bot,top);
     TLorentzVector Pos;
     gMC->TrackPosition(Pos);
- 
-    // calculate the dist2wire by approximation, although it seems like can be solved analytiaclly,
-    // with some messy steps, solution of cubic equation, etc.
-    // consider the tube inbetween enter and exit points
-    // this part will be approximaate as cylinder with linearized
 
-    // set the top and bottom end points of this wire(strawtube) sagment
-    // here, top_prime and bot_prime is just name, but may not be the "top" or "bottom", they may interchanged
-    TVector3 top_prime, bot_prime;
-    top_prime = ((top.x()-fPos.X())*bot + (fPos.X()-bot.x())*top)*(1./(top.x()-bot.x()));
-    bot_prime = ((top.x()-Pos.X())*bot + (Pos.X()-bot.x())*top)*(1./(top.x()-bot.x()));
- 
-    // Coordinate shift
-    //TVector3 fPos_prime = SaggingCoor(top,bot,fStrawSagging,fPos);
-    //TVector3 Pos_prime = SaggingCoor(top,bot,fStrawSagging,Pos);
-    TVector3 fPos_prime = fPos;
-    TVector3 Pos_prime = Pos;
-    top_prime = SaggingCoor(top,bot,fWireSagging,top_prime);
-    bot_prime = SaggingCoor(top,bot,fWireSagging,bot_prime);
+    // setup variable as the copied content
+    TVector3 start = top;
+    TVector3 stop = bot;
+    TVector3 pPos = 0.5*TVector3(Pos.X()+fPos.X(), Pos.Y()+fPos.Y(), Pos.Z()+fPos.Z());
 
+    // prepare to find wire sagging
+    Double_t delta = fWireSagging;
+    Double_t a = -4. * delta / TMath::Sq(start.x() - stop.x());
+    Double_t b = 0.5 * (start.x() + stop.x());
+    Double_t c = delta;
 
+    // copied from updated version
+    TVector3 wPos = ((start.x() - pPos.x()) * stop + (pPos.x() - stop.x()) * start) * (1./(start.x() - stop.x()));
+    Double_t wireShift = a * TMath::Sq(pPos.x()-b) + c;
+    TVector3 dr = pPos - (wPos - TVector3(0,wireShift,0));
 
-    // to find the dist2wire, it is a problem about distance between two straight line in 3D
-    // from result of calculus and linear algebra
-    // Vectors to simplify calculation
-    TVector3 u = Pos_prime - fPos_prime;
-    TVector3 v = top_prime - bot_prime;
-    TVector3 w = fPos_prime - bot_prime;
+    //prepare to find slope
+    Double_t slope = 2 * a * (pPos.x() - b);
+    slope = slope + (start.y() - stop.y())/(start.x() - stop.x());
 
-    // matrix elements for solving system of equation
-    Double_t a = u.Dot(u);
-    Double_t b = 0.-u.Dot(v);
-    Double_t c = 0.-v.Dot(u);
-    Double_t d = v.Dot(v);
-    Double_t e = 0.-u.Dot(w);
-    Double_t f = v.Dot(w);
+    Double_t theta = TMath::ATan(slope);
+    Double_t ds = TMath::Sqrt(dr.x()*dr.x() + dr.y() * dr.y()) * TMath::Cos(theta);
+    Double_t dz = dr.z();
+    Double_t result = TMath::Sqrt(ds*ds+dz*dz);
 
-    Double_t determinant = a*d-b*c;
-    //determinant=0 means u parallel to v, which shell not(?) happen in this case
-    if (determinant == 0.){ std::cout<<"determinant=0"<<std::endl; return kTRUE; }
-    Double_t k = (d*e-b*f)/determinant;
-    Double_t h = (-c*e+a*f)/determinant;
+    TVector3 pFromEnd = pPos - start;
+    result = TMath::Min(result, pFromEnd.Mag());
+    pFromEnd = pPos - stop;
+    result = TMath::Min(result, pFromEnd.Mag());
 
-    // need to handle if k not lie in [0,1], (?) will it really happen (?)
-    // if out of range, consider the nearest end point
-/*    std::cout << "==========================================================" <<std::endl;
-    if ((k < 0) or (k > 1))
-    {
-      std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-      std::cout << "k = " << k << std::endl;
-      std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-      k = (k<0) ? 0 : k;
-      k = (k>1) ? 1 : k;
-    } 
-    // h can be out of the [0,1] (?)
-    if ((h < 0) or (h > 1))
-    {
-      std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-      std::cout << "h = " << h << std::endl;
-      std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-      std::cout << h * (fPos_prime.x() - Pos_prime.x()) << std::endl;
-    }
-*/
-    TVector3 HitPos = fPos_prime + k*u;
-    TVector3 r = k*u-h*v+w;
-    Double_t dist2Wire = r.Mag();
-
+    Double_t dist2Wire = result;
     Double_t deltaTrackLength = gMC->TrackLength() - fLength;
-    AddHit(fTrackID, straw_uniqueId, HitPos,
+    AddHit(fTrackID, straw_uniqueId, pPos,
            TVector3(fMom.Px(), fMom.Py(), fMom.Pz()), fTime, deltaTrackLength,
            fELoss,pdgCode,dist2Wire);
 

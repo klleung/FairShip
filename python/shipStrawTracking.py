@@ -338,12 +338,21 @@ def run_track_pattern_recognition(input_file, geo_file, output_file, method):
             Z_true = []
             X_true = []
             Y_true = []
+            stat_true = []
             for ahit in sTree.strawtubesPoint:
+                h['x_all'].Fill(ahit.GetX())
+                h['y_all'].Fill(ahit.GetY())
+                h['z_all'].Fill(ahit.GetZ())
                 if ahit.GetTrackID() == tmax_tot:
                     az, ax, ay = ahit.GetZ(),ahit.GetX(),ahit.GetY()
                     Z_true.append(az)
                     X_true.append(ax)
                     Y_true.append(ay)
+                    statnb_temp, vnb_temp, pnb_temp, lnb_temp, snb_temp = decodeDetectorID(ahit.GetDetectorID())
+                    stat_true.append(statnb_temp)
+                    h['x_true'].Fill(ax)
+                    h['y_true'].Fill(ay)
+                    h['z_true'].Fill(az)
 
             
             metrics['reco_mc_p'] += [p]
@@ -474,6 +483,33 @@ def run_track_pattern_recognition(input_file, geo_file, output_file, method):
                     yerr = abs(Y_fit[i] - Y_true[i])
                     h['abs(x - x-true)'].Fill(xerr)
                     h['abs(y - y-true)'].Fill(yerr)
+                    h['x - x_true'].Fill(X_fit[i] - X_true[i])
+                    h['y - y_true'].Fill(Y_fit[i] - Y_true[i])
+                    if ((stat_true[i] == 1) or (stat_true[i] == 2)):
+                        h['abs(x - x-true)_12'].Fill(xerr)
+                        h['abs(y - y-true)_12'].Fill(yerr)
+                        h['x - x_true_12'].Fill(X_fit[i] - X_true[i])
+                        h['y - y_true_12'].Fill(Y_fit[i] - Y_true[i])
+                    else:
+                        h['abs(x - x-true)_34'].Fill(xerr)
+                        h['abs(y - y-true)_34'].Fill(yerr)
+                        h['x - x_true_34'].Fill(X_fit[i] - X_true[i])
+                        h['y - y_true_34'].Fill(Y_fit[i] - Y_true[i])
+                    if (X_true[i] < 20) and (X_true[i] > -20):
+                        h['abs(x - x-true)_mid'].Fill(xerr)
+                        h['abs(y - y-true)_mid'].Fill(yerr)
+                        h['x - x_true_mid'].Fill(X_fit[i] - X_true[i])
+                        h['y - y_true_mid'].Fill(Y_fit[i] - Y_true[i])
+                    elif (X_true[i] < 220) and (X_true[i] > 180):
+                        h['abs(x - x-true)_right'].Fill(xerr)
+                        h['abs(y - y-true)_right'].Fill(yerr)
+                        h['x - x_true_right'].Fill(X_fit[i] - X_true[i])
+                        h['y - y_true_right'].Fill(Y_fit[i] - Y_true[i])
+                    elif (X_true[i] < -180) and (X_true[i] > -220):
+                        h['abs(x - x-true)_left'].Fill(xerr)
+                        h['abs(y - y-true)_left'].Fill(yerr)
+                        h['x - x_true_left'].Fill(X_fit[i] - X_true[i])
+                        h['y - y_true_left'].Fill(Y_fit[i] - Y_true[i])
 
                 rmse_x = numpy.sqrt(numpy.mean((numpy.array(X_fit) - numpy.array(X_true))**2))
                 rmse_y = numpy.sqrt(numpy.mean((numpy.array(Y_fit) - numpy.array(Y_true))**2))
@@ -1005,6 +1041,34 @@ def init_book_hist():
 
     ut.bookHist(h,'abs(x - x-true)','Hits abs(x - x-true)',260,-0.05,5.05)
     ut.bookHist(h,'abs(y - y-true)','Hits abs(y - y-true)',260,-0.05,5.05)
+    ut.bookHist(h,'abs(x - x-true)_12','Hits abs(x - x-true)',260,-0.05,5.05)
+    ut.bookHist(h,'abs(y - y-true)_12','Hits abs(y - y-true)',260,-0.05,5.05)
+    ut.bookHist(h,'abs(x - x-true)_34','Hits abs(x - x-true)',260,-0.05,5.05)
+    ut.bookHist(h,'abs(y - y-true)_34','Hits abs(y - y-true)',260,-0.05,5.05)
+    ut.bookHist(h,'abs(x - x-true)_mid','Hits abs(x - x-true)',260,-0.05,5.05)
+    ut.bookHist(h,'abs(y - y-true)_mid','Hits abs(y - y-true)',260,-0.05,5.05)
+    ut.bookHist(h,'abs(x - x-true)_right','Hits abs(x - x-true)',260,-0.05,5.05)
+    ut.bookHist(h,'abs(y - y-true)_right','Hits abs(y - y-true)',260,-0.05,5.05)
+    ut.bookHist(h,'abs(x - x-true)_left','Hits abs(x - x-true)',260,-0.05,5.05)
+    ut.bookHist(h,'abs(y - y-true)_left','Hits abs(y - y-true)',260,-0.05,5.05)
+    ut.bookHist(h,'x - x_true','Hits (x - x-true)',260,-5.05,5.05)
+    ut.bookHist(h,'y - y_true','Hits (y - y-true)',260,-5.05,5.05)
+    ut.bookHist(h,'x - x_true_12','Hits (x - x-true)',260,-5.05,5.05)
+    ut.bookHist(h,'y - y_true_12','Hits (y - y-true)',260,-5.05,5.05)
+    ut.bookHist(h,'x - x_true_34','Hits (x - x-true)',260,-5.05,5.05)
+    ut.bookHist(h,'y - y_true_34','Hits (y - y-true)',260,-5.05,5.05)
+    ut.bookHist(h,'x - x_true_mid','Hits (x - x-true)',260,-5.05,5.05)
+    ut.bookHist(h,'y - y_true_mid','Hits (y - y-true)',260,-5.05,5.05)
+    ut.bookHist(h,'x - x_true_right','Hits (x - x-true)',260,-5.05,5.05)
+    ut.bookHist(h,'y - y_true_right','Hits (y - y-true)',260,-5.05,5.05)
+    ut.bookHist(h,'x - x_true_left','Hits (x - x-true)',260,-5.05,5.05)
+    ut.bookHist(h,'y - y_true_left','Hits (y - y-true)',260,-5.05,5.05)
+    ut.bookHist(h,'x_all','Points x(include not fitted track point',260,-300,300)
+    ut.bookHist(h,'y_all','Points y(include not fitted track point)',260,-700,700)
+    ut.bookHist(h,'z_all','Points z(include not fitted track point)',260,2000,8000)
+    ut.bookHist(h,'x_true','Hits x',260,-300,300)
+    ut.bookHist(h,'y_true','Hits y',260,-700,700)
+    ut.bookHist(h,'z_true','Hits z',260,2000,8000)
 
     ut.bookHist(h,'rmse_x','Hits x fit rmse',260,-0.05,5.05)
     ut.bookHist(h,'rmse_y','Hits y fit rmse',260,-0.05,5.05)
