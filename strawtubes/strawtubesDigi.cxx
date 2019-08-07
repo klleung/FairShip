@@ -259,7 +259,19 @@ Double_t strawtubesDigi::FindMisalignDist2Wire(TVector3 pPos, TVector3 start, TV
     result = TMath::Min(result, pFromEnd.Mag());
     return result;
 
-    // Another method, by using TF1 to find inverse function and minimize
+    // Another method, by using TF1 to find inverse function and minimize, not finished, cannot run
+    /*
+    TF1* dist2Wire2 = new TF1("dist2Wire2", "TMath::Sq([0] - x)+TMath::Sq([1]-strawtubesDigi::FindWireShift(x, [2], [3], [4]))", 0, 1);
+    dist2Wire2->SetParameter(0, pPos.x());
+    dist2Wire2->SetParameter(1, pPos.y());
+    dist2Wire2->SetParameter(2, start.x());
+    dist2Wire2->SetParameter(3, stop.x());
+    dist2Wire2->SetParameter(4, ID);
+    dist2Wire2->SetRange(start.x(), stop.x());
+    Double_t result = dist2Wire2->GetMinimum() + TMath::Sq(pPos.z() - start.z());
+    delete dist2Wire2;
+    return TMath::Sqrt(result);
+*/
 }
 
 Double_t strawtubesDigi::FindMisalignDist2Wire(strawtubesPoint* p)
