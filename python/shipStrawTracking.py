@@ -97,6 +97,7 @@ def run_track_pattern_recognition(input_file, geo_file, output_file, method):
       print "no fieldmap given, geofile too old, not anymore support"
       exit(-1)
     sGeo   = fgeo.FAIRGeom
+    # this 2 lines are not used, muted to avoid error 
     #geoMat =  ROOT.genfit.TGeoMaterialInterface()
     #ROOT.genfit.MaterialEffects.getInstance().init(geoMat)
     bfield = ROOT.genfit.FairShipFields()
@@ -1038,7 +1039,7 @@ def init_book_hist():
     ut.bookHist(h,'massfittedtracks','mass fitted tracks',210,-0.005,0.205)
     ut.bookHist(h,'pvspfitted','p-patrec vs p-fitted',401,-200.5,200.5,401,-200.5,200.5)
 
-
+    # added serval graph
     ut.bookHist(h,'abs(x - x-true)','Hits abs(x - x-true)',260,-0.05,5.05)
     ut.bookHist(h,'abs(y - y-true)','Hits abs(y - y-true)',260,-0.05,5.05)
     ut.bookHist(h,'abs(x - x-true)_12','Hits abs(x - x-true)',260,-0.05,5.05)

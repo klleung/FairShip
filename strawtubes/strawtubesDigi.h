@@ -10,6 +10,8 @@
 #include "strawtubesPoint.h"
 #include "strawtubes.h"
 
+// def a enum for the type of distribution used
+// just for convinence
 enum RANDTYPE{None, Gaus, Unif};
 typedef enum RANDTYPE RandType;
 
@@ -38,19 +40,19 @@ class strawtubesDigi {
     // to set the parameter of misalignment
     void PassRadius(Double_t r) {tubeRadius = r;};
     void SetDebug(bool debugFlag) {debug = debugFlag;};
-    void SetSameSagging(Double_t inMaxTubeSagging, Double_t inMaxWireSagging);
-    void SetGausSagging(Double_t inMaxTubeSagging, Double_t inTubeGausSigma, Double_t inMaxWireSagging, Double_t inWireGausSigma);
-    void SetUnifSagging(Double_t inMaxTubeSagging, Double_t inTubeUnifDelta, Double_t inMaxWireSagging, Double_t inWireUnifDelta);
-    bool CheckInTube(TVector3 pPos, TVector3 start, TVector3 stop, Float_t ID);
-    Double_t FindMisalignDist2Wire(TVector3 pPos, TVector3 start, TVector3 stop, Float_t ID);
-    Double_t FindMisalignDist2Wire(strawtubesPoint* p);
-    bool InSmallerSection(TVector3 pPos, TVector3 start, TVector3 stop, Float_t ID);
+    void SetSameSagging(Double_t inMaxTubeSagging, Double_t inMaxWireSagging);	// initialize, the setting be same sagging for all tube
+    void SetGausSagging(Double_t inMaxTubeSagging, Double_t inTubeGausSigma, Double_t inMaxWireSagging, Double_t inWireGausSigma);	//initialize, the sagging will have a gaussian distribtion, not well implemented
+    void SetUnifSagging(Double_t inMaxTubeSagging, Double_t inTubeUnifDelta, Double_t inMaxWireSagging, Double_t inWireUnifDelta);	// initialize, the saging will have a uniform distribution
+    bool CheckInTube(TVector3 pPos, TVector3 start, TVector3 stop, Float_t ID); // check a given is in tube or not
+    Double_t FindMisalignDist2Wire(TVector3 pPos, TVector3 start, TVector3 stop, Float_t ID); // find dist2wire base on sagging 
+    Double_t FindMisalignDist2Wire(strawtubesPoint* p);	//same as above, but input parameter is a point
+    bool InSmallerSection(TVector3 pPos, TVector3 start, TVector3 stop, Float_t ID); // check the point is in which section
     bool IsMisalign() { return misalign;}
     bool IsInitialized() { return beingInit;}
 
-    // old version
-    void InitializeMisalign(Double_t tubeSag, Double_t wireSag, Double_t r, bool inDebug); 
-    void InitializeMisalign(Double_t tubeMean, Double_t tubeSigma, Double_t wireSigma, Double_t wireMean, Double_t r, bool inDebug); 
+    // old version, initialize by one line
+    void InitializeMisalign(Double_t tubeSag, Double_t wireSag, Double_t r, bool inDebug); // no distribution case
+    void InitializeMisalign(Double_t tubeMean, Double_t tubeSigma, Double_t wireSigma, Double_t wireMean, Double_t r, bool inDebug); // gaussian case, not well implemented 
 
     Double_t GetWireOffset(Float_t ID);
 
@@ -84,25 +86,25 @@ class strawtubesDigi {
     void parabolaChainsEstimation(Double_t wireOffset);
 
     // Misalignment part
-    Double_t tubeRadius = 1.0;
-    Double_t maxTubeSagging = 0.0;
-    Double_t maxWireSagging = 0.0;
-    Double_t tubeGausSigma = 0.0;
-    Double_t wireGausSigma = 0.0;
-    Double_t tubeUnifDelta = 0.0;
-    Double_t wireUnifDelta = 0.0;
-    std::map<Float_t, Double_t> tubeSaggingMap;
-    std::map<Float_t, Double_t> wireSaggingMap;
-    bool misalign = false;
-    RandType randType = None;
-    bool debug = false;
-    bool beingInit = false;
+    Double_t tubeRadius = 1.0;		// the tube radius, used to check in tube or not
+    Double_t maxTubeSagging = 0.0;	// maximum sagging of tubes, mean value/mpv if distribution is used
+    Double_t maxWireSagging = 0.0;	// as above, but for wire
+    Double_t tubeGausSigma = 0.0;	// for gaussain used, sigma for tube
+    Double_t wireGausSigma = 0.0;	// as above, for wire
+    Double_t tubeUnifDelta = 0.0;	// for uniform distribution, delta is half of the range
+    Double_t wireUnifDelta = 0.0;	// as above, for wire
+    std::map<Float_t, Double_t> tubeSaggingMap;	// a map store the maximum sagging for each strawtube, with key as straw ID
+    std::map<Float_t, Double_t> wireSaggingMap;	// as above, for wire
+    bool misalign = false;		// Is misalignment is used or not
+    RandType randType = None;		// the type of distribution
+    bool debug = false;			// a flag to turn on debug or not
+    bool beingInit = false;		// since the initialze funciton will be called in loop, avoid initlaize again
 
-    Double_t FindTubeShift(Double_t x, Double_t startx, Double_t stopx, Float_t ID);
-    Double_t FindWireShift(Double_t x, Double_t startx, Double_t stopx, Float_t ID);
-    Double_t GetMaxTubeSagging(Float_t ID);
-    Double_t GetMaxWireSagging(Float_t ID);
-    Double_t FindWireSlope(Double_t x, TVector3 start, TVector3 stop, Float_t ID);
+    Double_t FindTubeShift(Double_t x, Double_t startx, Double_t stopx, Float_t ID);	// find the shift at a given x
+    Double_t FindWireShift(Double_t x, Double_t startx, Double_t stopx, Float_t ID);	// as above, for wire
+    Double_t GetMaxTubeSagging(Float_t ID);						// get the value of max. sagging from map
+    Double_t GetMaxWireSagging(Float_t ID);						// as above, for wire
+    Double_t FindWireSlope(Double_t x, TVector3 start, TVector3 stop, Float_t ID);	// find the slope of the wire, for better linearlized approximation calculation
 
 };
 

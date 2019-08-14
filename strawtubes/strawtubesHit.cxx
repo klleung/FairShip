@@ -44,6 +44,7 @@ strawtubesHit::strawtubesHit(strawtubesPoint* p, Double_t t0)
      flag = false;
      Double_t dist2Wire;
      TVector3 pPos;
+     // calculate dist2Wire with  misalign or not
      if (strawtubesDigi::Instance().IsMisalign())
      {
         pPos = TVector3(p->GetX(), p->GetY(), p->GetZ());
@@ -59,8 +60,11 @@ strawtubesHit::strawtubesHit(strawtubesPoint* p, Double_t t0)
         dist2Wire = p->dist2Wire();
      }
 
+     // if the hit is vaild (still inside the tube)
      if (flag)
      {
+        // use which way calculate the drift time
+        // default is used for invistigate sagging only
         if (strawtubesDigi::Instance().IsDefaultDriftTime())
         {
             driftTime = fabs( gRandom->Gaus( dist2Wire, sigma_spatial ) )/v_drift;

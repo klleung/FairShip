@@ -714,18 +714,19 @@ class ShipDigiReco:
    from strawDigi_conf import DriftTimeCalculate as dtc
 
    # turn on Drift time part or not, or using default setting
+   # true = using constant drift velocity (default way)
    ROOT.strawtubesDigi.Instance().UseDefaultDriftTime(dtc.defaultDriftTime)
 
    # misalign part
-   beingInit = ROOT.strawtubesDigi.Instance().IsInitialized()
+   beingInit = ROOT.strawtubesDigi.Instance().IsInitialized() #digitize will be called in loop, prevent initialize again
    if (stm.misalign and (not beingInit)):
      ROOT.strawtubesDigi.Instance().PassRadius(ShipGeo.strawtubes.InnerStrawDiameter/2.)
      ROOT.strawtubesDigi.Instance().SetDebug(stm.debug)
-     if stm.randType == "None":
+     if stm.randType == "None":		# no distribution
        ROOT.strawtubesDigi.Instance().SetSameSagging(stm.maxTubeSagging, stm.maxWireSagging)
-     elif stm.randType == "Gaus":
+     elif stm.randType == "Gaus":	# gaussian, not implemented well
        ROOT.strawtubesDigi.Instance().SetGausSagging(stm.maxTubeSagging, stm.tubeGausSigma, stm.maxWireSagging, stm.wireGausSigma)
-     elif stm.randType == "Unif":
+     elif stm.randType == "Unif":	# uniform distribution
        ROOT.strawtubesDigi.Instance().SetUnifSagging(stm.maxTubeSagging, stm.tubeUnifDelta, stm.maxWireSagging, stm.wireUnifDelta)
      else:
        print "Not a proper type of distribution for strawtube sagging"
@@ -792,9 +793,9 @@ class ShipDigiReco:
 
      # use true t0  construction: 
      #     fdigi = t0 + p->GetTime() + t_drift + ( stop[0]-p->GetX() )/ speedOfLight;
-     if (ROOT.strawtubesDigi.Instance().IsDefaultDriftTime()):
+     if (ROOT.strawtubesDigi.Instance().IsDefaultDriftTime()):	# using drift velocity calculation
          smear = (aDigi.GetDigi() - self.sTree.t0  - p.GetTime() - ( stop[0]-p.GetX() )/ u.speedOfLight) * v_drift
-     else:
+     else:	# for the updated drift time calculation method
          aHit = ROOT.strawtubesHit(p,self.sTree.t0)
          TDC = aHit.GetTDC()
          t0 = self.sTree.t0 + p.GetTime()
